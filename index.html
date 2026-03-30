@@ -376,24 +376,22 @@ const COUNTRIES = {
   SE:{name:'스웨덴',avg:14.9,h:180.0},NL:{name:'네덜란드',avg:15.9,h:182.5}
 };
 
+// 실제 사물 크기 기반 매칭 (커뮤니티 검증)
 const OBJECTS = [
-  {min:0,max:7.5,emoji:'🤙',name:'새끼손가락',desc:'...이게 다야?'},
-  {min:7.5,max:8.5,emoji:'💄',name:'립밤',desc:'바르기엔 충분한 사이즈'},
-  {min:8.5,max:9.5,emoji:'🔥',name:'라이터',desc:'불 붙이긴 할 수 있지'},
-  {min:9.5,max:10.5,emoji:'🍤',name:'새우',desc:'구부리면 더 작아지는'},
-  {min:10.5,max:11.3,emoji:'🌭',name:'칵테일 소시지',desc:'한입에 끝나는 파티용'},
-  {min:11.3,max:12,emoji:'🥚',name:'계란',desc:'후라이 하기엔 아까운'},
-  {min:12,max:12.7,emoji:'🫒',name:'김밥 한 줄',desc:'한 줄이면 부족한 느낌'},
-  {min:12.7,max:13.3,emoji:'🍌',name:'바나나',desc:'국민 과일 국민 사이즈'},
-  {min:13.3,max:14,emoji:'🌽',name:'옥수수',desc:'알이 꽉 찬 건강한 놈'},
-  {min:14,max:14.8,emoji:'🥒',name:'오이',desc:'팩하기 아까운 프리미엄'},
-  {min:14.8,max:15.5,emoji:'🍠',name:'군고구마',desc:'겨울에 호호 불며 잡는'},
-  {min:15.5,max:16.5,emoji:'🌶️',name:'청양고추',desc:'매운맛 보여줄게'},
-  {min:16.5,max:17.5,emoji:'🍆',name:'가지',desc:'이모지계의 전설 그 자체'},
-  {min:17.5,max:18.5,emoji:'🦴',name:'족발 앞다리',desc:'쫄면 2인분과 환상 궁합'},
-  {min:18.5,max:19.5,emoji:'🥖',name:'바게트',desc:'프랑스 장인이 구운 명품'},
-  {min:19.5,max:21,emoji:'🐍',name:'뱀',desc:'풀숲에서 나타나면 비명'},
-  {min:21,max:99,emoji:'⚾',name:'야구배트',desc:'이쯤 되면 무기입니다'}
+  {min:0,max:7.5,emoji:'🤙',name:'새끼손가락',desc:'...진짜 이게 끝? (6cm)'},
+  {min:7.5,max:9,emoji:'🧃',name:'소주잔',desc:'한잔 하시겠습니까 (8cm)'},
+  {min:9,max:10,emoji:'🖍️',name:'크레파스',desc:'유치원 때 쓰던 그거 (9cm)'},
+  {min:10,max:11,emoji:'🍤',name:'새우',desc:'구부리면 더 작아지는 (10cm)'},
+  {min:11,max:12,emoji:'🖱️',name:'마우스',desc:'우클릭이 최선인 (11cm)'},
+  {min:12,max:12.5,emoji:'🍺',name:'캔맥주',desc:'시원하게 원샷 각 (12.2cm)'},
+  {min:12.5,max:13.2,emoji:'🌭',name:'프랑크소시지',desc:'빵 사이에 끼우면 딱 (13cm)'},
+  {min:13.2,max:14,emoji:'📱',name:'아이폰',desc:'항상 손에 쥐고 사는 (14cm)'},
+  {min:14,max:15,emoji:'📺',name:'리모컨',desc:'채널 돌리기 딱 좋은 (15cm)'},
+  {min:15,max:16.5,emoji:'🍌',name:'바나나',desc:'까면 진짜 달콤한 (16cm)'},
+  {min:16.5,max:18,emoji:'🍆',name:'가지',desc:'이모지계의 전설 (17cm)'},
+  {min:18,max:20,emoji:'🌽',name:'옥수수',desc:'알이 꽉 찬 대물급 (19cm)'},
+  {min:20,max:22,emoji:'🧴',name:'500ml 페트병',desc:'2L도 가능할 기세 (21cm)'},
+  {min:22,max:99,emoji:'🔫',name:'AK-47',desc:'이쯤 되면 무기입니다'}
 ];
 
 const COMMENTS = [
