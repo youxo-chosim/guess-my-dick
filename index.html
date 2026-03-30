@@ -7,6 +7,13 @@
 <meta property="og:title" content="Guess My Dick - AI 사이즈 예측">
 <meta property="og:description" content="AI가 당신의 얼굴과 손을 분석해 사이즈를 과학적으로 예측합니다">
 <meta property="og:type" content="website">
+<!-- GA4 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+<script>
+window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
+gtag('js',new Date());gtag('config','G-XXXXXXXXXX');
+function track(event,params){try{gtag('event',event,params||{})}catch(e){}}
+</script>
 <meta name="google-adsense-account" content="ca-pub-4454035059273488">
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4454035059273488"
      crossorigin="anonymous"></script>
@@ -958,12 +965,12 @@ function showScreen(id) {
 
 // ============ APP ============
 const App = {
-  confirmAge() { showScreen('s-landing'); },
-  denyAge() { alert('만 18세 이상만 이용 가능합니다.'); },
+  confirmAge() { track('age_confirmed'); showScreen('s-landing'); },
+  denyAge() { track('age_denied'); alert('만 18세 이상만 이용 가능합니다.'); },
 
   start() {
+    track('start_clicked', { is_group_invite: state.group.length > 0 });
     showScreen('s-info');
-    // Preload face models in background
     loadFaceModels().catch(console.error);
   },
 
@@ -986,6 +993,7 @@ const App = {
     if (!weight || weight < 30 || weight > 200) { alert('몸무게를 정확히 입력해주세요 (30-200kg)'); return; }
 
     Object.assign(state, { name, country, height, weight });
+    track('info_submitted', { country, height, weight });
     showScreen('s-face');
     this.startFaceCamera();
   },
@@ -1137,6 +1145,7 @@ const App = {
         // Draw landmarks on overlay
         await this._drawFaceLandmarks(canvas, overlay, wrap);
 
+        track('face_success');
         status.textContent = '✓ 얼굴 분석 완료!';
         status.className = 'camera-status success';
         btn.classList.add('captured');
@@ -1224,6 +1233,7 @@ const App = {
   },
 
   _showRetry(wrap, btn, status, type, msg) {
+    track(type + '_failed', { reason: msg });
     this._clearScanEffects(wrap);
     wrap.classList.remove('frozen');
     const overlay = wrap.querySelector('canvas');
@@ -1296,6 +1306,7 @@ const App = {
         state.noseWidth = result.noseWidth;
         state.faceDetected = true;
         await this._drawFaceLandmarks(canvas, overlay, wrap);
+        track('face_success');
         status.textContent = '✓ 얼굴 분석 완료!';
         status.className = 'camera-status success';
         btn.classList.add('captured');
@@ -1357,6 +1368,7 @@ const App = {
         state.fingerRatio = result.ratio;
         state.handDetected = true;
         await this._drawHandLandmarks(canvas, wrap);
+        track('hand_success');
         status.textContent = '✓ 손 분석 완료!';
         status.className = 'camera-status success';
         btn.classList.add('captured');
@@ -1515,6 +1527,7 @@ const App = {
         // Draw hand landmarks
         await this._drawHandLandmarks(canvas, wrap);
 
+        track('hand_success');
         status.textContent = '✓ 손 분석 완료!';
         status.className = 'camera-status success';
         btn.classList.add('captured');
@@ -1666,6 +1679,12 @@ const App = {
       </div>
     `).join('');
 
+    // Track result
+    track('result_viewed', {
+      size, girth, total_score: totalScore,
+      percentile, object: obj.name, country: state.country
+    });
+
     // Ranking
     this.renderRanking();
 
@@ -1690,6 +1709,7 @@ const App = {
   },
 
   async shareChallenge() {
+    track('share_challenge', { score: state.totalScore, size: state.result });
     const encoded = encodeGroup(state.group);
     const url = window.location.origin + window.location.pathname + '?g=' + encoded;
     const text = `🍆 나는 상위 ${100 - state.percentile}%! 너는 몇 cm일까?\n길이: ${state.result}cm | 둘레: ${state.girth}cm\n${getObject(state.result).emoji} "${getObject(state.result).name}" 사이즈\n\n지금 측정해봐 👇`;
@@ -1710,6 +1730,7 @@ const App = {
   },
 
   async shareImage() {
+    track('share_image', { score: state.totalScore, size: state.result });
     try {
       const card = document.getElementById('result-card');
       const canvas = await html2canvas(card, {
@@ -1743,6 +1764,7 @@ const App = {
   },
 
   restart() {
+    track('restart');
     this._stopAutoDetect();
     this._isCapturing = false;
     stopCamera();
