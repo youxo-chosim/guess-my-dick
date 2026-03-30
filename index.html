@@ -85,6 +85,8 @@ select option{color:#333;background:#fff}
 .result-object-emoji{font-size:80px;line-height:1;margin:4px 0}
 .result-size{font-size:84px;font-weight:900;color:#dc2626;background:linear-gradient(135deg,#dc2626,#e84a1e,#f59e0b);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;line-height:1}
 .result-unit{font-size:24px;font-weight:800;-webkit-text-fill-color:#999}
+.result-girth{font-size:15px;font-weight:700;color:#888;margin-top:4px}
+.result-girth span{color:#dc2626;font-size:18px;font-weight:900}
 .result-object-name{font-size:22px;font-weight:800;color:#1a1a1a;margin-top:8px}
 .result-object-desc{font-size:14px;color:#888;margin-top:2px}
 .result-percentile{margin:20px 0;padding:16px;background:#f5f5f5;border-radius:16px}
@@ -301,6 +303,9 @@ select option{color:#333;background:#fff}
     <div class="count-up" style="animation-delay:.3s">
       <span class="result-size" id="r-size"></span>
       <span class="result-unit">cm</span>
+    </div>
+    <div class="result-girth fade-in fade-in-d2" id="r-girth-wrap">
+      둘레 <span id="r-girth"></span>cm
     </div>
     <div class="result-object-name fade-in fade-in-d2" id="r-obj-name"></div>
     <div class="result-object-desc fade-in fade-in-d2" id="r-obj-desc"></div>
@@ -553,7 +558,7 @@ function parseCSV(text) {
 // ============ STATE ============
 const state = {
   name:'', country:'KR', height:170, weight:70,
-  noseRatio:null, fingerRatio:null,
+  noseRatio:null, noseWidth:null, fingerRatio:null,
   result:null, percentile:null,
   group:[], faceDetected:false, handDetected:false,
   cameraStream:null, modelsLoaded:false, handsModel:null
@@ -873,12 +878,28 @@ function calculateResult() {
   predicted = Math.max(7.5, Math.min(23, predicted));
   predicted = Math.round(predicted * 10) / 10;
 
+  // ===== GIRTH (둘레) CALCULATION =====
+  // Average girth: ~11.5cm circumference
+  // Nose width correlates with girth (separate from length)
+  let girth = 11.5;
+  if (state.noseRatio !== null) {
+    const noseW = state.noseWidth ?? 0.22;
+    const avgNoseW = 0.22;
+    girth += ((noseW - avgNoseW) / 0.02) * 0.4;
+  }
+  // BMI slightly affects girth perception
+  girth += bmiAdj * 0.5;
+  girth += (Math.random() * 0.4 - 0.1);
+  girth = Math.max(7, Math.min(16, girth));
+  girth = Math.round(girth * 10) / 10;
+
   const pct = getPercentile(predicted);
 
   state.result = predicted;
+  state.girth = girth;
   state.percentile = pct;
 
-  return { size: predicted, percentile: pct, factors };
+  return { size: predicted, girth, percentile: pct, factors };
 }
 
 // ============ UI NAVIGATION ============
@@ -1067,6 +1088,7 @@ const App = {
         this._showRetry(wrap, btn, status, 'face', result.message);
       } else if (result && result.noseRatio) {
         state.noseRatio = result.noseRatio;
+        state.noseWidth = result.noseWidth;
         state.faceDetected = true;
 
         // Draw landmarks on overlay
@@ -1228,6 +1250,7 @@ const App = {
         this._showRetry(wrap, btn, status, 'face', result.message);
       } else if (result && result.noseRatio) {
         state.noseRatio = result.noseRatio;
+        state.noseWidth = result.noseWidth;
         state.faceDetected = true;
         await this._drawFaceLandmarks(canvas, overlay, wrap);
         status.textContent = '✓ 얼굴 분석 완료!';
@@ -1561,7 +1584,7 @@ const App = {
   },
 
   showResult() {
-    const { size, percentile, factors } = calculateResult();
+    const { size, girth, percentile, factors } = calculateResult();
 
     // Add to group
     const me = { name: state.name, size };
@@ -1578,6 +1601,7 @@ const App = {
     document.getElementById('r-comment-sub').textContent = comment.sub;
     document.getElementById('r-emoji').textContent = obj.emoji;
     document.getElementById('r-size').textContent = size;
+    document.getElementById('r-girth').textContent = girth;
     document.getElementById('r-obj-name').textContent = `"${obj.name}" 사이즈`;
     document.getElementById('r-obj-desc').textContent = obj.desc;
     document.getElementById('r-percentile').textContent = `상위 ${100 - percentile}%`;
@@ -1624,7 +1648,7 @@ const App = {
   async shareChallenge() {
     const encoded = encodeGroup(state.group);
     const url = window.location.origin + window.location.pathname + '?g=' + encoded;
-    const text = `🍆 나는 상위 ${100 - state.percentile}%! 너는 몇 cm일까?\n내 사이즈: ${state.result}cm (${getObject(state.result).name} 사이즈)\n\n지금 측정해봐 👇`;
+    const text = `🍆 나는 상위 ${100 - state.percentile}%! 너는 몇 cm일까?\n길이: ${state.result}cm | 둘레: ${state.girth}cm\n${getObject(state.result).emoji} "${getObject(state.result).name}" 사이즈\n\n지금 측정해봐 👇`;
 
     if (navigator.share) {
       try {
