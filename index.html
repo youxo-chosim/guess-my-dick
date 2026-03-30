@@ -864,8 +864,8 @@ function calculateResult() {
 
   // 2. Finger factor (weight: 20%, r=0.216)
   if (state.fingerRatio !== null) {
-    const avgRatio = 0.955;
-    const dev = (avgRatio - state.fingerRatio) / 0.025; // lower = bigger
+    const avgRatio = 0.98; // meta-analysis: male right hand avg (n=11,789)
+    const dev = (avgRatio - state.fingerRatio) / 0.04; // SD=0.04, lower = bigger
     const adj = dev * 0.5;
     predicted += adj;
     factors.push({ emoji:'✋', label:'손가락', value: adj });
