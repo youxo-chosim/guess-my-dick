@@ -332,11 +332,10 @@ select option{color:#333;background:#fff}
 
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script>
 // ============ CONSTANTS ============
-const FACE_MODEL_URL = 'https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js@master/weights';
+// MediaPipe Face Mesh - loaded dynamically
 
 const COUNTRIES = {
   KR:{name:'한국',avg:13.0,h:173.5},JP:{name:'일본',avg:13.0,h:171.0},
@@ -435,9 +434,18 @@ function decodeGroup(encoded) {
 // ============ CAMERA ============
 async function startCamera(videoEl) {
   try {
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode:'user', width:{ideal:640}, height:{ideal:480} }
-    });
+    // Try exact front camera first
+    let stream;
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { exact: 'user' }, width:{ideal:640}, height:{ideal:480} }
+      });
+    } catch {
+      // Fallback without exact
+      stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'user', width:{ideal:640}, height:{ideal:480} }
+      });
+    }
     videoEl.srcObject = stream;
     state.cameraStream = stream;
     await videoEl.play();
@@ -479,106 +487,114 @@ function waitForVideo(videoEl, maxWait = 3000) {
   });
 }
 
-// ============ FACE ANALYSIS ============
+// ============ FACE ANALYSIS (MediaPipe Face Mesh - 468 landmarks) ============
 async function loadFaceModels() {
   if (state.modelsLoaded) return;
 
-  // Always load landmarks
-  await faceapi.nets.faceLandmark68Net.loadFromUri(FACE_MODEL_URL);
-
-  // Try SSD first (better accuracy), fallback to Tiny
-  try {
-    await faceapi.nets.ssdMobilenetv1.loadFromUri(FACE_MODEL_URL);
-    state.hasSSD = true;
-    console.log('SSD model loaded');
-  } catch (e) {
-    console.warn('SSD model unavailable, using TinyFaceDetector:', e.message);
-    state.hasSSD = false;
+  // Dynamically load MediaPipe Face Mesh
+  if (typeof FaceMesh === 'undefined') {
+    await new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = 'https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js';
+      s.crossOrigin = 'anonymous';
+      s.onload = resolve;
+      s.onerror = reject;
+      document.head.appendChild(s);
+    });
   }
 
-  await faceapi.nets.tinyFaceDetector.loadFromUri(FACE_MODEL_URL);
-  console.log('TinyFaceDetector loaded');
+  state.faceMesh = new FaceMesh({
+    locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`
+  });
+  state.faceMesh.setOptions({
+    maxNumFaces: 1,
+    refineLandmarks: true,
+    minDetectionConfidence: 0.6,
+    minTrackingConfidence: 0.5
+  });
+
+  // Warm up the model
+  await new Promise((resolve) => {
+    state.faceMesh.onResults(() => resolve());
+    const c = document.createElement('canvas');
+    c.width = 10; c.height = 10;
+    c.getContext('2d').fillRect(0,0,10,10);
+    state.faceMesh.send({ image: c });
+  });
 
   state.modelsLoaded = true;
+  console.log('MediaPipe Face Mesh loaded (468 landmarks)');
 }
 
 async function analyzeFace(canvas) {
-  if (canvas.width < 10 || canvas.height < 10) {
-    console.error('Canvas too small:', canvas.width, canvas.height);
-    return null;
-  }
+  if (canvas.width < 10 || canvas.height < 10) return null;
 
-  let detection = null;
+  return new Promise((resolve) => {
+    state.faceMesh.onResults((results) => {
+      if (!results.multiFaceLandmarks || results.multiFaceLandmarks.length === 0) {
+        console.log('No face detected by MediaPipe');
+        resolve(null);
+        return;
+      }
 
-  // Try SsdMobilenetv1 first (more accurate, higher threshold)
-  try {
-    detection = await faceapi.detectSingleFace(canvas, new faceapi.SsdMobilenetv1Options({ minConfidence: 0.5 }))
-      .withFaceLandmarks();
-    if (detection) console.log('Face detected with SSD, score:', detection.detection.score);
-  } catch (e) {
-    console.warn('SSD detector failed:', e);
-  }
+      const lm = results.multiFaceLandmarks[0]; // 468 normalized landmarks (0~1)
 
-  // Fallback to TinyFaceDetector
-  if (!detection) {
-    try {
-      detection = await faceapi.detectSingleFace(canvas, new faceapi.TinyFaceDetectorOptions({ inputSize: 416, scoreThreshold: 0.4 }))
-        .withFaceLandmarks();
-      if (detection) console.log('Face detected with Tiny, score:', detection.detection.score);
-    } catch (e) {
-      console.warn('Tiny detector failed:', e);
-    }
-  }
+      // ===== VALIDATION =====
+      const noseTip = lm[4];
+      const leftEye = lm[33];
+      const rightEye = lm[263];
+      const eyeDist = Math.abs(rightEye.x - leftEye.x);
 
-  if (!detection) return null;
+      console.log('Face detected:', {
+        noseX: noseTip.x.toFixed(2), noseY: noseTip.y.toFixed(2),
+        eyeDist: eyeDist.toFixed(3)
+      });
 
-  // ===== VALIDATION: face must be centered & large enough =====
-  const box = detection.detection.box;
-  const faceCenterX = (box.x + box.width / 2) / canvas.width;
-  const faceCenterY = (box.y + box.height / 2) / canvas.height;
-  const faceWidthRatio = box.width / canvas.width;
-  const faceHeightRatio = box.height / canvas.height;
+      // Face center check (nose tip should be in middle area)
+      if (noseTip.x < 0.2 || noseTip.x > 0.8) {
+        resolve({ rejected: 'center', message: '얼굴을 가운데로 맞춰주세요' });
+        return;
+      }
+      if (noseTip.y < 0.1 || noseTip.y > 0.8) {
+        resolve({ rejected: 'center', message: '얼굴을 가운데로 맞춰주세요' });
+        return;
+      }
 
-  console.log('Face position:', {
-    centerX: faceCenterX.toFixed(2), centerY: faceCenterY.toFixed(2),
-    widthRatio: faceWidthRatio.toFixed(2), heightRatio: faceHeightRatio.toFixed(2)
+      // Face size check (eye distance as proxy)
+      if (eyeDist < 0.06) {
+        resolve({ rejected: 'size', message: '카메라에 더 가까이 와주세요' });
+        return;
+      }
+      if (eyeDist > 0.45) {
+        resolve({ rejected: 'size', message: '카메라에서 조금 떨어져주세요' });
+        return;
+      }
+
+      // ===== NOSE MEASUREMENTS (468 landmark indices) =====
+      const noseBridge = lm[6];     // between eyes (bridge top)
+      const noseMid = lm[197];      // nose bridge middle
+      const noseBottom = lm[2];     // below septum
+      const noseLeft = lm[98];      // left nostril outer
+      const noseRight = lm[327];    // right nostril outer
+      const forehead = lm[10];      // top of forehead
+      const chin = lm[152];         // bottom of chin
+
+      const noseLen = dist(noseBridge, noseBottom);
+      const noseWid = dist(noseLeft, noseRight);
+      const faceH = dist(forehead, chin);
+
+      console.log('Nose ratio:', (noseLen/faceH).toFixed(3), 'Width:', (noseWid/faceH).toFixed(3));
+
+      resolve({
+        noseRatio: noseLen / faceH,
+        noseWidth: noseWid / faceH,
+        faceHeight: faceH,
+        landmarks: lm  // pass for drawing
+      });
+    });
+
+    state.faceMesh.send({ image: canvas });
   });
-
-  // Face center must be within middle 60% of frame
-  if (faceCenterX < 0.2 || faceCenterX > 0.8) {
-    console.log('Face rejected: too far left/right');
-    return { rejected: 'center', message: '얼굴을 가운데로 맞춰주세요' };
-  }
-  if (faceCenterY < 0.15 || faceCenterY > 0.75) {
-    console.log('Face rejected: too far up/down');
-    return { rejected: 'center', message: '얼굴을 가운데로 맞춰주세요' };
-  }
-
-  // Face must be at least 18% of frame width (not too far away)
-  if (faceWidthRatio < 0.18) {
-    console.log('Face rejected: too small');
-    return { rejected: 'size', message: '카메라에 더 가까이 와주세요' };
-  }
-
-  // Face must not be too large (> 85% means too close, can't measure properly)
-  if (faceWidthRatio > 0.85) {
-    console.log('Face rejected: too large');
-    return { rejected: 'size', message: '카메라에서 조금 떨어져주세요' };
-  }
-
-  const lm = detection.landmarks;
-  const nose = lm.getNose();
-  const jaw = lm.getJawOutline();
-
-  const noseLen = dist(nose[0], nose[6]);
-  const noseWid = dist(nose[4], nose[8]);
-  const faceH = dist(jaw[8], nose[0]);
-
-  return {
-    noseRatio: noseLen / faceH,
-    noseWidth: noseWid / faceH,
-    faceHeight: faceH
-  };
 }
 
 // ============ HAND ANALYSIS ============
@@ -616,11 +632,24 @@ function analyzeHand(canvas) {
         resolve(null); return;
       }
       const lm = results.multiHandLandmarks[0];
-      // Index finger: MCP(5) → PIP(6) → DIP(7) → TIP(8)
+
+      // Index finger (2nd): MCP(5) → PIP(6) → DIP(7) → TIP(8)
       const indexLen = dist3(lm[5],lm[6]) + dist3(lm[6],lm[7]) + dist3(lm[7],lm[8]);
-      // Ring finger: MCP(13) → PIP(14) → DIP(15) → TIP(16)
+      // Ring finger (4th): MCP(13) → PIP(14) → DIP(15) → TIP(16)
       const ringLen = dist3(lm[13],lm[14]) + dist3(lm[14],lm[15]) + dist3(lm[15],lm[16]);
-      resolve({ ratio: indexLen / ringLen }); // 2D:4D ratio
+
+      // Validation: fingers should have reasonable lengths
+      if (indexLen < 0.01 || ringLen < 0.01) {
+        console.log('Hand rejected: finger lengths too small');
+        resolve(null);
+        return;
+      }
+
+      const ratio = indexLen / ringLen;
+      console.log('2D:4D ratio:', ratio.toFixed(4), 'Index:', indexLen.toFixed(3), 'Ring:', ringLen.toFixed(3));
+
+      // Store landmarks for drawing
+      resolve({ ratio, landmarks: lm, indexLen, ringLen });
     });
     state.handsModel.send({ image: canvas });
   });
@@ -815,53 +844,62 @@ const App = {
   },
 
   async _drawFaceLandmarks(canvas, overlay, wrap) {
-    const detection = await faceapi.detectSingleFace(canvas, new faceapi.TinyFaceDetectorOptions({ inputSize: 416, scoreThreshold: 0.3 }))
-      .withFaceLandmarks();
-    if (!detection) return;
+    // Use landmarks already stored from analyzeFace
+    // MediaPipe landmarks are normalized (0-1), need to scale to wrap size
+    const w = wrap.clientWidth;
+    const h = wrap.clientHeight;
 
-    const lm = detection.landmarks;
-    const nose = lm.getNose();
-    const jaw = lm.getJawOutline();
-    const scaleX = wrap.clientWidth / canvas.width;
-    const scaleY = wrap.clientHeight / canvas.height;
+    // Key nose landmarks (MediaPipe 468 indices)
+    const noseIndices = [6, 197, 195, 4, 1, 2, 98, 327, 94, 323];
+    // Jaw outline
+    const jawIndices = [10, 338, 297, 332, 284, 251, 389, 356, 454, 323, 361, 288, 397, 365, 379, 378, 400, 377, 152, 148, 176, 149, 150, 136, 172, 58, 132, 93, 234, 127, 162, 21, 54, 103, 67, 109];
 
-    // Nose points
-    const nosePoints = nose.map(p => ({
-      x: (canvas.width - p.x) * scaleX,  // mirror
-      y: p.y * scaleY
-    }));
+    // We need to re-analyze to get landmarks for drawing
+    const drawLandmarks = (lm) => {
+      // Nose points (bright green)
+      noseIndices.forEach((idx, i) => {
+        const p = lm[idx];
+        const dot = document.createElement('div');
+        dot.className = 'landmark-dot';
+        dot.style.left = ((1 - p.x) * w - 3) + 'px'; // mirror
+        dot.style.top = (p.y * h - 3) + 'px';
+        wrap.appendChild(dot);
+        setTimeout(() => dot.classList.add('visible'), 800 + i * 60);
+      });
 
-    // Draw dots with staggered delay
-    nosePoints.forEach((p, i) => {
-      const dot = document.createElement('div');
-      dot.className = 'landmark-dot';
-      dot.style.left = (p.x - 3) + 'px';
-      dot.style.top = (p.y - 3) + 'px';
-      wrap.appendChild(dot);
-      setTimeout(() => dot.classList.add('visible'), 800 + i * 80);
-    });
+      // Nose measurement label
+      const noseBridge = lm[6];
+      const label = document.createElement('div');
+      label.className = 'scan-label';
+      label.textContent = `코 비율: ${((state.noseRatio || 0) * 100).toFixed(1)}%`;
+      label.style.left = ((1 - noseBridge.x) * w + 20) + 'px';
+      label.style.top = (noseBridge.y * h) + 'px';
+      wrap.appendChild(label);
+      setTimeout(() => label.classList.add('visible'), 1300);
 
-    // Nose length label
-    const noseTop = nosePoints[0];
-    const noseBot = nosePoints[6];
-    const label = document.createElement('div');
-    label.className = 'scan-label';
-    label.textContent = `코 길이: ${((state.noseRatio || 0) * 100).toFixed(1)}%`;
-    label.style.left = (noseTop.x + 20) + 'px';
-    label.style.top = ((noseTop.y + noseBot.y) / 2) + 'px';
-    wrap.appendChild(label);
-    setTimeout(() => label.classList.add('visible'), 1400);
+      // Jaw dots (dimmer)
+      jawIndices.filter((_, i) => i % 3 === 0).forEach((idx, i) => {
+        const p = lm[idx];
+        const dot = document.createElement('div');
+        dot.className = 'landmark-dot';
+        dot.style.left = ((1 - p.x) * w - 3) + 'px';
+        dot.style.top = (p.y * h - 3) + 'px';
+        dot.style.background = 'rgba(0,255,136,.3)';
+        dot.style.boxShadow = '0 0 4px rgba(0,255,136,.2)';
+        wrap.appendChild(dot);
+        setTimeout(() => dot.classList.add('visible'), 1000 + i * 50);
+      });
+    };
 
-    // Jaw outline dots (sparse)
-    jaw.filter((_, i) => i % 2 === 0).forEach((p, i) => {
-      const dot = document.createElement('div');
-      dot.className = 'landmark-dot';
-      dot.style.left = ((canvas.width - p.x) * scaleX - 3) + 'px';
-      dot.style.top = (p.y * scaleY - 3) + 'px';
-      dot.style.background = 'rgba(0,255,136,.4)';
-      dot.style.boxShadow = '0 0 6px rgba(0,255,136,.3)';
-      wrap.appendChild(dot);
-      setTimeout(() => dot.classList.add('visible'), 1000 + i * 60);
+    // Re-send to get landmarks for drawing
+    await new Promise((resolve) => {
+      state.faceMesh.onResults((results) => {
+        if (results.multiFaceLandmarks && results.multiFaceLandmarks.length > 0) {
+          drawLandmarks(results.multiFaceLandmarks[0]);
+        }
+        resolve();
+      });
+      state.faceMesh.send({ image: canvas });
     });
   },
 
@@ -1107,37 +1145,78 @@ const App = {
   },
 
   async _drawHandLandmarks(canvas, wrap) {
-    const scaleX = wrap.clientWidth / canvas.width;
-    const scaleY = wrap.clientHeight / canvas.height;
+    const w = wrap.clientWidth;
+    const h = wrap.clientHeight;
 
-    // Use stored hand results - draw key finger points
-    // Index finger: 5,6,7,8  Ring finger: 13,14,15,16
-    const fingerPoints = [5,6,7,8,13,14,15,16,0,4,12,17,20];
-    fingerPoints.forEach((idx, i) => {
-      const dot = document.createElement('div');
-      dot.className = 'landmark-dot';
-      // Approximate positions based on hand structure
-      const angle = (idx / 21) * Math.PI * 0.8 - 0.2;
-      const radius = 0.15 + (idx % 4) * 0.08;
-      const cx = wrap.clientWidth * (0.55 - Math.sin(angle) * radius);
-      const cy = wrap.clientHeight * (0.45 + Math.cos(angle) * radius * 0.8);
-      dot.style.left = cx + 'px';
-      dot.style.top = cy + 'px';
-      wrap.appendChild(dot);
-      setTimeout(() => dot.classList.add('visible'), 800 + i * 60);
+    // Re-analyze to get landmarks for drawing
+    await new Promise((resolve) => {
+      state.handsModel.onResults((results) => {
+        if (!results.multiHandLandmarks || results.multiHandLandmarks.length === 0) {
+          resolve(); return;
+        }
+        const lm = results.multiHandLandmarks[0];
+
+        // Draw all 21 hand landmarks
+        const allPoints = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
+        allPoints.forEach((idx, i) => {
+          const p = lm[idx];
+          const dot = document.createElement('div');
+          dot.className = 'landmark-dot';
+          dot.style.left = ((1 - p.x) * w - 3) + 'px'; // mirror
+          dot.style.top = (p.y * h - 3) + 'px';
+
+          // Color code: index=cyan, ring=magenta, others=dim green
+          if ([5,6,7,8].includes(idx)) {
+            dot.style.background = '#00e5ff';
+            dot.style.boxShadow = '0 0 10px #00e5ff';
+          } else if ([13,14,15,16].includes(idx)) {
+            dot.style.background = '#ff4081';
+            dot.style.boxShadow = '0 0 10px #ff4081';
+          } else {
+            dot.style.background = 'rgba(0,255,136,.3)';
+            dot.style.boxShadow = '0 0 4px rgba(0,255,136,.2)';
+          }
+          wrap.appendChild(dot);
+          setTimeout(() => dot.classList.add('visible'), 700 + i * 40);
+        });
+
+        // Labels for index and ring fingers
+        const indexTip = lm[8];
+        const ringTip = lm[16];
+
+        const lbl1 = document.createElement('div');
+        lbl1.className = 'scan-label';
+        lbl1.textContent = '검지';
+        lbl1.style.left = ((1 - indexTip.x) * w + 10) + 'px';
+        lbl1.style.top = (indexTip.y * h - 10) + 'px';
+        lbl1.style.color = '#00e5ff';
+        wrap.appendChild(lbl1);
+        setTimeout(() => lbl1.classList.add('visible'), 1200);
+
+        const lbl2 = document.createElement('div');
+        lbl2.className = 'scan-label';
+        lbl2.textContent = '약지';
+        lbl2.style.left = ((1 - ringTip.x) * w + 10) + 'px';
+        lbl2.style.top = (ringTip.y * h - 10) + 'px';
+        lbl2.style.color = '#ff4081';
+        wrap.appendChild(lbl2);
+        setTimeout(() => lbl2.classList.add('visible'), 1200);
+
+        // Ratio label
+        if (state.fingerRatio) {
+          const label = document.createElement('div');
+          label.className = 'scan-label';
+          label.textContent = `2D:4D = ${state.fingerRatio.toFixed(3)}`;
+          label.style.left = '16px';
+          label.style.bottom = '16px';
+          label.style.top = 'auto';
+          wrap.appendChild(label);
+          setTimeout(() => label.classList.add('visible'), 1500);
+        }
+        resolve();
+      });
+      state.handsModel.send({ image: canvas });
     });
-
-    // Ratio label
-    if (state.fingerRatio) {
-      const label = document.createElement('div');
-      label.className = 'scan-label';
-      label.textContent = `2D:4D 비율: ${state.fingerRatio.toFixed(3)}`;
-      label.style.left = '16px';
-      label.style.bottom = '16px';
-      label.style.top = 'auto';
-      wrap.appendChild(label);
-      setTimeout(() => label.classList.add('visible'), 1400);
-    }
   },
 
   async showAnalysis() {
