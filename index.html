@@ -98,8 +98,14 @@ select option{color:#333;background:#fff}
 .factor-value{font-size:13px;font-weight:700;color:#eee;margin-top:2px}
 .factor-value.positive{color:#f59e0b}
 .factor-value.negative{color:#ef4444}
-.result-disclaimer{font-size:10px;color:#555;margin-top:12px}
+.result-divider{width:60px;height:2px;background:rgba(255,255,255,.1);margin:16px auto}
+.result-comment{margin:8px 0}
+.comment-main{font-size:18px;font-weight:800;color:#fbbf24}
+.comment-sub{font-size:13px;color:#999;margin-top:4px}
+.result-factors-title{font-size:11px;color:#666;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px}
+.result-disclaimer{font-size:10px;color:#555;margin-top:16px}
 .result-watermark{font-size:11px;color:#444;margin-top:8px;letter-spacing:1px}
+.share-explain{font-size:12px;color:rgba(255,255,255,.4);text-align:center;line-height:1.5;margin:-4px 0 4px}
 /* Group Ranking */
 .ranking-section{width:100%;max-width:380px;background:rgba(220,38,38,.08);border:1px solid rgba(220,38,38,.2);backdrop-filter:blur(10px);border-radius:20px;padding:20px;margin-top:4px}
 .ranking-title{font-size:18px;font-weight:800;margin-bottom:12px;text-align:center}
@@ -289,7 +295,6 @@ select option{color:#333;background:#fff}
 <section class="screen result-screen" id="s-result">
   <div class="result-card fade-in" id="result-card">
     <div class="result-name" id="r-name"></div>
-    <div class="result-badge" id="r-badge"></div>
     <div class="result-object-emoji fade-in fade-in-d1" id="r-emoji"></div>
     <div class="count-up" style="animation-delay:.3s">
       <span class="result-size" id="r-size"></span>
@@ -297,11 +302,18 @@ select option{color:#333;background:#fff}
     </div>
     <div class="result-object-name fade-in fade-in-d2" id="r-obj-name"></div>
     <div class="result-object-desc fade-in fade-in-d2" id="r-obj-desc"></div>
+    <div class="result-divider"></div>
     <div class="result-percentile fade-in fade-in-d3">
       <div class="percentile-text">전 세계 남성 기준</div>
       <div class="percentile-value" id="r-percentile"></div>
       <div class="percentile-bar"><div class="percentile-bar-fill" id="r-pbar"></div></div>
     </div>
+    <div class="result-comment fade-in fade-in-d3">
+      <div class="comment-main" id="r-comment"></div>
+      <div class="comment-sub" id="r-comment-sub"></div>
+    </div>
+    <div class="result-divider"></div>
+    <div class="result-factors-title fade-in fade-in-d4">AI 분석 근거</div>
     <div class="result-factors fade-in fade-in-d4" id="r-factors"></div>
     <div class="result-disclaimer">* 발기 시 기준 예측 · 엔터테인먼트 목적</div>
     <div class="result-watermark">GUESS MY DICK</div>
@@ -312,6 +324,7 @@ select option{color:#333;background:#fff}
   </div>
   <div class="share-buttons fade-in fade-in-d4">
     <button class="btn btn-primary" onclick="App.shareChallenge()">🔗 친구에게 도전장 보내기</button>
+    <p class="share-explain">링크를 받은 친구가 측정하면<br>자동으로 랭킹이 업데이트됩니다!</p>
     <button class="btn btn-secondary" onclick="App.shareImage()">📸 결과 이미지 저장</button>
     <button class="btn btn-secondary btn-small" onclick="App.restart()">🔄 다시 측정하기</button>
   </div>
@@ -356,12 +369,13 @@ const OBJECTS = [
 ];
 
 const COMMENTS = [
-  {min:95,text:'전설이 걸어다닌다... 👑'},
-  {min:85,text:'자신감 MAX! 당당하게 사세요 🔥'},
-  {min:70,text:'평균 이상의 축복받은 스펙 ✨'},
-  {min:40,text:'딱 좋은 황금 사이즈! 👌'},
-  {min:20,text:'테크닉으로 승부하는 진짜 고수 😎'},
-  {min:0,text:'포켓 사이즈 매력 폭발 💎'}
+  {min:95,text:'야 이거 실화냐... 전설급 대물 👑',sub:'여친이 자랑하고 다닐 사이즈'},
+  {min:85,text:'축하합니다, 유전자 복권 당첨 🔥',sub:'자신있게 불 꺼도 됩니다'},
+  {min:70,text:'평균 이상! 당당하게 사세요 💪',sub:'사이즈 걱정은 접어두셔도'},
+  {min:50,text:'딱 좋은 황금 사이즈 👌',sub:'중요한 건 사이즈가 아니라 각도'},
+  {min:30,text:'테크닉으로 승부하는 타입 😏',sub:'기술이 좋으면 사이즈는 숫자일 뿐'},
+  {min:15,text:'컴팩트한 파워! 작지만 강하다 💎',sub:'손가락이 길면 됩니다'},
+  {min:0,text:'마이크로 히어로 등장 🦸',sub:'중요한 건 꺾이지 않는 마음'}
 ];
 
 // ============ STATE ============
@@ -397,7 +411,7 @@ function getObject(size) {
 }
 
 function getComment(pct) {
-  return COMMENTS.find(c => pct >= c.min)?.text || '';
+  return COMMENTS.find(c => pct >= c.min) || COMMENTS[COMMENTS.length-1];
 }
 
 // ============ GROUP ENCODING ============
@@ -1128,7 +1142,8 @@ const App = {
 
     // Fill result card
     document.getElementById('r-name').textContent = state.name + '의 분석 결과';
-    document.getElementById('r-badge').textContent = comment;
+    document.getElementById('r-comment').textContent = comment.text;
+    document.getElementById('r-comment-sub').textContent = comment.sub;
     document.getElementById('r-emoji').textContent = obj.emoji;
     document.getElementById('r-size').textContent = size;
     document.getElementById('r-obj-name').textContent = `"${obj.name}" 사이즈`;
