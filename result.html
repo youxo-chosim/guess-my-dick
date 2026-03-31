@@ -125,6 +125,27 @@ function getObject(size) {
   return OBJECTS.find(o => size >= o.min && size < o.max) || OBJECTS[OBJECTS.length - 1];
 }
 
+const COMMENTS = [
+  {min:97,pool:[{text:'야 이거 실화냐... 🤯',sub:'이 정도면 흉기소지죄 적용 가능'},{text:'경찰에 신고해야 하나 📞',sub:'위험물 소지 혐의'},{text:'이걸로 뭘 하시는 거예요...',sub:'소방관이 필요한 사이즈'}]},
+  {min:93,pool:[{text:'형... 존경합니다 🫡',sub:'인생 이겼다 그냥'},{text:'여친이 친구들한테 자랑할 사이즈 📢',sub:'"우리 오빠가..." 시전 가능'},{text:'축하합니다 유전자 복권 1등 🎰',sub:'부모님 감사 전화 ㄱㄱ'}]},
+  {min:88,pool:[{text:'이 정도면 바지 핏이 다르겠네 👖',sub:'스키니진 포기하셨죠?'},{text:'꽤 쓸만하시네요? 😏',sub:'자주 쓰시나 봐요'},{text:'솔직히 부럽다... 👏',sub:'인정할 건 인정'}]},
+  {min:82,pool:[{text:'오 나쁘지 않은데? 👀',sub:'기대 이상이었어'},{text:'합격 💯',sub:'사이즈 면접 통과하셨습니다'},{text:'평균보다 크네 ㅊㅋ 🎉',sub:'상위 20% 진입'}]},
+  {min:75,pool:[{text:'오 쓸만하네? 😮',sub:'생각보다 괜찮아서 놀람'},{text:'평균 이상이면 승리 아님? 🏅',sub:'반 이상 이겼다는 뜻'},{text:'나름 괜찮네 나름... 📊',sub:'칭찬이에요 이거'}]},
+  {min:65,pool:[{text:'중상위권 ㅊㅋ 📈',sub:'노력하면 더 커보일 수 있음 (각도)'},{text:'못할 것도 없는 사이즈 💁',sub:'애매하게 괜찮음'},{text:'살짝 자랑해도 될 듯? 🤏',sub:'아주 살짝만'}]},
+  {min:55,pool:[{text:'딱 국민 사이즈 🇰🇷',sub:'대한민국 평균의 자부심'},{text:'보통이 제일 좋은 거래 ☺️',sub:'의사 선생님이 그랬음'},{text:'평균이면 된 거 아님? 📋',sub:'표준 규격 통과'}]},
+  {min:45,pool:[{text:'성격 좋으시잖아~ 한잔해~ 🍺',sub:'사이즈는 잊고 건배'},{text:'크기보다 중요한 건 마음이래 💝',sub:'엄마가 그랬음'},{text:'음... 뭐 나쁘진 않아 😐',sub:'좋지도 않지만'}]},
+  {min:35,pool:[{text:'작은 고추가 맵다? 🌶️',sub:'근데 걍 작은 고추일 수도'},{text:'그냥 넌 잘생겨야겠다...^^ 🪞',sub:'외모로 커버 ㄱㄱ'},{text:'손가락이 길면 되니까... ✌️',sub:'ㅋㅋㅋㅋ 위로가 되나?'}]},
+  {min:25,pool:[{text:'귀여워서 깨물지도 못하겠다 🐹',sub:'아기자기한 매력'},{text:'아담하고 귀여운 사이즈네 🐣',sub:'여친이 "귀엽다" 할 듯 (칭찬 아님)'},{text:'기내반입 가능 ✈️',sub:'어디든 들고 다닐 수 있어'}]},
+  {min:15,pool:[{text:'ㅋㅋ 솔직히 좀... 많이 작음 📏',sub:'현실을 직시합시다'},{text:'돈을 많이 벌어야겠다 💰',sub:'진짜로. 진심으로.'},{text:'포켓 사이즈라고 하자 👛',sub:'긍정의 힘'}]},
+  {min:8,pool:[{text:'혹시... 여자...? 🤔',sub:'아닌가? 미안'},{text:'AI가 측정을 포기했습니다 🤖',sub:'ERROR 404: SIZE NOT FOUND'},{text:'이건 뭐 ㅋㅋ 할 말을 잃었 💬',sub:'무슨 말을 해야...'}]},
+  {min:0,pool:[{text:'이 결과를 공유하면 당신은 용자 🫡',sub:'존경합니다 진심으로'},{text:'중요한 건 꺾이지 않는 마음 💪',sub:'물리적으로는 꺾일 수도'},{text:'성격이 좋으면 됩니다 😇',sub:'...그쵸?'}]}
+];
+
+function getComment(pct) {
+  const g = COMMENTS.find(c => pct >= c.min) || COMMENTS[COMMENTS.length-1];
+  return g.pool[Math.floor(Math.random() * g.pool.length)];
+}
+
 // ============ GROUP ENCODING ============
 function encodeGroup(members) {
   try {
