@@ -252,7 +252,7 @@ select option{color:#333;background:#fff}
   <div class="progress-bar"><div class="progress-fill" style="width:100%"></div></div>
   <div class="analyzing">
     <div class="spinner"></div>
-    <h2 style="font-size:24px;font-weight:800" data-i18n="analyzing">AI 분석 중</h2>
+    <h2 id="analyzing-title" style="font-size:24px;font-weight:800" data-i18n="analyzing">AI 분석 중</h2>
     <div class="analysis-steps" id="analysis-steps">
       <div class="analysis-step" data-step="0" data-i18n="a_step0">얼굴 특징 추출 중...</div>
       <div class="analysis-step" data-step="1" data-i18n="a_step1">코 비율 측정 중...</div>
@@ -1618,6 +1618,7 @@ const App = {
 
     await new Promise(r => setTimeout(r, 400));
     document.querySelector('.spinner').style.display = 'none';
+    document.getElementById('analyzing-title').textContent = 'AI 분석 완료!';
     document.getElementById('btn-reveal').style.display = '';
   },
 
@@ -1693,6 +1694,7 @@ const App = {
     if (handGuide) handGuide.style.opacity = '1';
     // Reset analyzing screen
     document.querySelector('.spinner').style.display = '';
+    document.getElementById('analyzing-title').textContent = 'AI 분석 중';
     document.getElementById('btn-reveal').style.display = 'none';
     showScreen('s-info');
   }

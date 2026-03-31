@@ -24,7 +24,7 @@ function track(event,params){try{gtag('event',event,params||{})}catch(e){}}
 :root{--red:#dc2626;--crimson:#7f1d1d;--gold:#f59e0b;--amber:#fbbf24;--dark:#0a0a0a;--card:rgba(255,255,255,.05)}
 body{font-family:'Pretendard Variable',system-ui,-apple-system,sans-serif;background:#0a0a0a;background-image:radial-gradient(ellipse at 20% 50%,rgba(220,38,38,.08) 0%,transparent 50%),radial-gradient(ellipse at 80% 20%,rgba(245,158,11,.06) 0%,transparent 50%);min-height:100dvh;color:#fff;overflow-x:hidden;-webkit-tap-highlight-color:transparent}
 /* Buttons */
-.btn{width:100%;max-width:360px;padding:18px;border:none;border-radius:16px;font-size:18px;font-weight:700;cursor:pointer;transition:all .2s;font-family:inherit}
+.btn{width:100%;max-width:380px;padding:18px;border:none;border-radius:16px;font-size:18px;font-weight:700;cursor:pointer;transition:all .2s;font-family:inherit}
 .btn-primary{background:linear-gradient(135deg,#dc2626,#f59e0b);color:#fff;box-shadow:0 8px 30px rgba(220,38,38,.3)}
 .btn-primary:active{transform:scale(.97)}
 .btn-secondary{background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.15);backdrop-filter:blur(10px)}
@@ -363,10 +363,12 @@ async function shareImage() {
       ctx.closePath();
     }
 
+    const S = 2; // scale factor for high-res
     const W = 750, H = 1100;
     const canvas = document.createElement('canvas');
-    canvas.width = W; canvas.height = H;
+    canvas.width = W * S; canvas.height = H * S;
     const ctx = canvas.getContext('2d');
+    ctx.scale(S, S);
     ctx.textAlign = 'center';
 
     // Background
