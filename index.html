@@ -88,59 +88,6 @@ select option{color:#333;background:#fff}
 .analysis-step.active{opacity:1}
 .analysis-step.done{opacity:.7}
 .analysis-step.done::before{content:'✓ ';color:#10b981}
-/* Result */
-.result-screen{padding-top:40px;gap:20px;padding-bottom:40px;background:radial-gradient(ellipse at 50% 20%,rgba(220,38,38,.18) 0%,transparent 55%),radial-gradient(ellipse at 50% 80%,rgba(245,158,11,.12) 0%,transparent 55%)}
-.result-card{background:rgba(20,20,20,.95);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.1);border-radius:24px;padding:36px 24px;width:100%;max-width:380px;color:#fff;text-align:center;box-shadow:0 0 60px rgba(220,38,38,.1),0 20px 60px rgba(0,0,0,.3)}
-.result-name{font-size:15px;color:#777;margin-bottom:8px}
-.result-object-emoji{font-size:80px;line-height:1;margin:4px 0}
-.result-size{font-size:84px;font-weight:900;color:#dc2626;background:linear-gradient(135deg,#dc2626,#e84a1e,#f59e0b);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;line-height:1}
-.result-unit{font-size:24px;font-weight:800;-webkit-text-fill-color:#999}
-.result-girth{font-size:15px;font-weight:700;color:#888;margin-top:4px}
-.result-girth span{color:#dc2626;font-size:18px;font-weight:900}
-.result-object-name{font-size:22px;font-weight:800;color:#fff;margin-top:8px}
-.result-object-desc{font-size:14px;color:#999;margin-top:2px}
-.result-percentile{margin:20px 0;padding:16px;background:rgba(255,255,255,.06);border-radius:16px}
-.percentile-text{font-size:13px;color:#888;margin-bottom:6px}
-.percentile-value{font-size:36px;font-weight:900;color:#dc2626}
-.percentile-bar{height:8px;background:rgba(255,255,255,.1);border-radius:4px;margin-top:8px;overflow:hidden}
-.percentile-bar-fill{height:100%;background:linear-gradient(90deg,#f59e0b,#dc2626);border-radius:4px;transition:width 1.5s ease}
-.result-factors{display:flex;gap:8px;margin-top:12px}
-.factor{flex:1;background:rgba(255,255,255,.06);border-radius:12px;padding:10px 6px;text-align:center}
-.factor-emoji{font-size:20px}
-.factor-label{font-size:10px;color:#777;margin-top:2px}
-.factor-value{font-size:13px;font-weight:700;color:#eee;margin-top:2px}
-.factor-value.positive{color:#f59e0b}
-.factor-value.negative{color:#ef4444}
-.result-divider{width:50px;height:2px;background:rgba(255,255,255,.1);margin:16px auto}
-.result-comment{margin:8px 0;padding:14px;background:rgba(220,38,38,.12);border:1px solid rgba(220,38,38,.2);border-radius:14px}
-.comment-main{font-size:17px;font-weight:800;color:#fff}
-.comment-sub{font-size:13px;color:#aaa;margin-top:4px}
-.result-factors-title{font-size:11px;color:#666;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px}
-.result-score{margin:16px 0;text-align:center}
-.result-score-label{font-size:13px;color:#888;margin-bottom:4px}
-.result-score-value{font-size:56px;font-weight:900;background:linear-gradient(135deg,#f59e0b,#dc2626);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:#f59e0b}
-.result-score-max{font-size:18px;-webkit-text-fill-color:#666;color:#666}
-.result-specs{display:flex;gap:12px;justify-content:center;margin:8px 0}
-.result-spec{text-align:center}
-.result-spec-val{font-size:36px;font-weight:900;color:#fff}
-.result-spec-label{font-size:13px;color:#777;margin-top:2px}
-.result-disclaimer{font-size:10px;color:#555;margin-top:16px}
-.result-watermark{font-size:11px;color:#444;margin-top:8px;letter-spacing:1px}
-.share-explain{font-size:12px;color:rgba(255,255,255,.4);text-align:center;line-height:1.5;margin:-4px 0 4px}
-/* Group Ranking */
-.ranking-section{width:100%;max-width:380px;background:rgba(220,38,38,.08);border:1px solid rgba(220,38,38,.2);backdrop-filter:blur(10px);border-radius:20px;padding:20px;margin-top:4px}
-.ranking-title{font-size:18px;font-weight:800;margin-bottom:12px;text-align:center}
-.ranking-list{display:flex;flex-direction:column;gap:8px}
-.ranking-item{display:flex;align-items:center;gap:12px;padding:10px 14px;background:rgba(255,255,255,.04);border-radius:12px}
-.ranking-item.me{background:rgba(220,38,38,.12);border:2px solid rgba(220,38,38,.35)}
-.ranking-pos{font-size:18px;font-weight:900;width:28px;text-align:center}
-.ranking-pos.gold{color:#fbbf24}
-.ranking-pos.silver{color:#d1d5db}
-.ranking-pos.bronze{color:#d97706}
-.ranking-name{flex:1;font-weight:600}
-.ranking-size{font-weight:800;font-size:17px}
-/* Share buttons */
-.share-buttons{width:100%;max-width:380px;display:flex;flex-direction:column;gap:10px}
 /* Age gate */
 .age-gate{justify-content:center;text-align:center;gap:24px}
 .age-gate h2{font-size:32px;font-weight:800}
@@ -310,62 +257,13 @@ select option{color:#333;background:#fff}
       <div class="analysis-step" data-step="3">신체 데이터 종합 중...</div>
       <div class="analysis-step" data-step="4">AI 예측 모델 적용 중...</div>
     </div>
+    <button class="btn btn-primary" id="btn-reveal" style="display:none;font-size:20px;margin-top:16px" onclick="App.goToResult()">결과 확인하기! 🍆</button>
   </div>
 </section>
 
-<!-- Screen: Result -->
-<section class="screen result-screen" id="s-result">
-  <div class="result-card fade-in" id="result-card">
-    <div class="result-name" id="r-name"></div>
-    <div class="result-object-emoji fade-in fade-in-d1" id="r-emoji"></div>
-    <div class="result-specs fade-in fade-in-d1">
-      <div class="result-spec">
-        <div class="result-spec-val" id="r-size">-</div>
-        <div class="result-spec-label">길이 (cm)</div>
-      </div>
-      <div class="result-spec" style="color:#555;font-size:24px;padding-top:4px">×</div>
-      <div class="result-spec">
-        <div class="result-spec-val" id="r-girth">-</div>
-        <div class="result-spec-label">둘레 (cm)</div>
-      </div>
-    </div>
-    <div class="result-score fade-in fade-in-d2">
-      <div class="result-score-label">총점</div>
-      <div><span class="result-score-value" id="r-score">-</span><span class="result-score-max"> / 100</span></div>
-    </div>
-    <div class="result-object-name fade-in fade-in-d2" id="r-obj-name"></div>
-    <div class="result-object-desc fade-in fade-in-d2" id="r-obj-desc"></div>
-    <div class="result-divider"></div>
-    <div class="result-percentile fade-in fade-in-d3">
-      <div class="percentile-text">전 세계 남성 기준</div>
-      <div class="percentile-value" id="r-percentile"></div>
-      <div class="percentile-bar"><div class="percentile-bar-fill" id="r-pbar"></div></div>
-    </div>
-    <div class="result-comment fade-in fade-in-d3">
-      <div class="comment-main" id="r-comment"></div>
-      <div class="comment-sub" id="r-comment-sub"></div>
-    </div>
-    <div class="result-divider"></div>
-    <div class="result-factors-title fade-in fade-in-d4">AI 분석 근거</div>
-    <div class="result-factors fade-in fade-in-d4" id="r-factors"></div>
-    <div class="result-disclaimer">* 발기 시 기준 예측 · 엔터테인먼트 목적</div>
-    <div class="result-watermark">GUESS MY DICK</div>
-  </div>
-  <div class="ranking-section fade-in fade-in-d3" id="ranking-section">
-    <div class="ranking-title">🏆 그룹 랭킹</div>
-    <div class="ranking-list" id="ranking-list"></div>
-  </div>
-  <div class="share-buttons fade-in fade-in-d4">
-    <button class="btn btn-primary" onclick="App.shareChallenge()">🔗 친구에게 도전장 보내기</button>
-    <p class="share-explain">링크를 받은 친구가 측정하면<br>자동으로 랭킹이 업데이트됩니다!</p>
-    <button class="btn btn-secondary" onclick="App.shareImage()">📸 결과 이미지 저장</button>
-    <button class="btn btn-secondary btn-small" onclick="App.restart()">🔄 다시 측정하기</button>
-  </div>
-</section>
 
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script>
 // ============ CONSTANTS ============
 // MediaPipe Face Mesh - loaded dynamically
@@ -953,7 +851,7 @@ function calculateResult() {
 }
 
 // ============ UI NAVIGATION ============
-const SCREENS = ['s-age','s-landing','s-info','s-face','s-hand','s-analyzing','s-result'];
+const SCREENS = ['s-age','s-landing','s-info','s-face','s-hand','s-analyzing'];
 let currentScreen = 0;
 
 function showScreen(id) {
@@ -1636,10 +1534,11 @@ const App = {
     }
 
     await new Promise(r => setTimeout(r, 400));
-    this.showResult();
+    document.querySelector('.spinner').style.display = 'none';
+    document.getElementById('btn-reveal').style.display = '';
   },
 
-  showResult() {
+  goToResult() {
     const { size, girth, percentile, totalScore, factors } = calculateResult();
 
     // Add to group
@@ -1651,116 +1550,26 @@ const App = {
     const obj = getObject(size);
     const comment = getComment(percentile);
 
-    // Fill result card
-    document.getElementById('r-name').textContent = state.name + '의 분석 결과';
-    document.getElementById('r-comment').textContent = comment.text;
-    document.getElementById('r-comment-sub').textContent = comment.sub;
-    document.getElementById('r-emoji').textContent = obj.emoji;
-    document.getElementById('r-size').textContent = size;
-    document.getElementById('r-girth').textContent = girth;
-    document.getElementById('r-score').textContent = totalScore;
-    document.getElementById('r-obj-name').textContent = `"${obj.name}" 사이즈`;
-    document.getElementById('r-obj-desc').textContent = obj.desc;
-    document.getElementById('r-percentile').textContent = `상위 ${100 - percentile}%`;
+    // Save to localStorage for result.html
+    localStorage.setItem('gmd-result', JSON.stringify({
+      name: state.name,
+      size,
+      girth,
+      percentile,
+      totalScore,
+      factors,
+      obj,
+      comment,
+      group: state.group
+    }));
 
-    setTimeout(() => {
-      document.getElementById('r-pbar').style.width = percentile + '%';
-    }, 300);
-
-    // Factors
-    const fEl = document.getElementById('r-factors');
-    fEl.innerHTML = factors.map(f => `
-      <div class="factor">
-        <div class="factor-emoji">${f.emoji}</div>
-        <div class="factor-label">${f.label}</div>
-        <div class="factor-value ${f.value >= 0 ? 'positive' : 'negative'}">
-          ${f.value >= 0 ? '+' : ''}${f.value.toFixed(1)}cm
-        </div>
-      </div>
-    `).join('');
-
-    // Track result
-    track('result_viewed', {
+    // GA4 tracking
+    track('view_result', {
       size, girth, total_score: totalScore,
       percentile, object: obj.name, country: state.country
     });
 
-    // Ranking
-    this.renderRanking();
-
-    showScreen('s-result');
-  },
-
-  renderRanking() {
-    const list = document.getElementById('ranking-list');
-    const medals = ['gold', 'silver', 'bronze'];
-    const icons = ['👑', '🥈', '🥉'];
-
-    list.innerHTML = state.group.map((m, i) => `
-      <div class="ranking-item ${m.name === state.name ? 'me' : ''}">
-        <div class="ranking-pos ${medals[i] || ''}">${i < 3 ? icons[i] : (i+1)}</div>
-        <div class="ranking-name">${m.name} ${m.name === state.name ? '← 나' : ''}</div>
-        <div class="ranking-size">${m.size}cm</div>
-      </div>
-    `).join('');
-
-    document.getElementById('ranking-section').style.display =
-      state.group.length > 1 ? 'block' : 'none';
-  },
-
-  async shareChallenge() {
-    track('share_challenge', { score: state.totalScore, size: state.result });
-    const encoded = encodeGroup(state.group);
-    const url = window.location.origin + window.location.pathname + '?g=' + encoded;
-    const text = `🍆 나는 상위 ${100 - state.percentile}%! 너는 몇 cm일까?\n길이: ${state.result}cm | 둘레: ${state.girth}cm\n${getObject(state.result).emoji} "${getObject(state.result).name}" 사이즈\n\n지금 측정해봐 👇`;
-
-    if (navigator.share) {
-      try {
-        await navigator.share({ title: 'Guess My Dick', text, url });
-        return;
-      } catch {}
-    }
-    // Fallback: copy
-    try {
-      await navigator.clipboard.writeText(text + '\n' + url);
-      alert('링크가 복사되었습니다! 친구에게 보내주세요 🔗');
-    } catch {
-      prompt('아래 링크를 복사해서 공유하세요:', url);
-    }
-  },
-
-  async shareImage() {
-    track('share_image', { score: state.totalScore, size: state.result });
-    try {
-      const card = document.getElementById('result-card');
-      const canvas = await html2canvas(card, {
-        backgroundColor: '#ffffff',
-        scale: 2,
-        useCORS: true,
-        logging: false
-      });
-
-      canvas.toBlob(async (blob) => {
-        if (navigator.share && navigator.canShare) {
-          const file = new File([blob], 'guess-my-dick.png', { type: 'image/png' });
-          if (navigator.canShare({ files: [file] })) {
-            try {
-              await navigator.share({ files: [file], title: 'Guess My Dick 결과' });
-              return;
-            } catch {}
-          }
-        }
-        // Fallback: download
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = `guess-my-dick-${state.name}.png`;
-        a.click();
-        URL.revokeObjectURL(a.href);
-      }, 'image/png');
-    } catch (e) {
-      console.error(e);
-      alert('이미지 생성에 실패했습니다');
-    }
+    window.location.href = 'result.html';
   },
 
   restart() {
@@ -1799,8 +1608,9 @@ const App = {
     // Reset hand guide
     const handGuide = document.querySelector('#s-hand .hand-guide');
     if (handGuide) handGuide.style.opacity = '1';
-    // Reset result
-    document.getElementById('r-pbar').style.width = '0%';
+    // Reset analyzing screen
+    document.querySelector('.spinner').style.display = '';
+    document.getElementById('btn-reveal').style.display = 'none';
     showScreen('s-info');
   }
 };

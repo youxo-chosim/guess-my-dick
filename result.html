@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Guess My Dick - 결과</title>
+<meta property="og:title" content="Guess My Dick - AI 사이즈 예측 결과">
+<meta property="og:description" content="AI가 예측한 내 사이즈 결과 확인!">
+<meta property="og:type" content="website">
+<!-- GA4 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+<script>
+window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
+gtag('js',new Date());gtag('config','G-XXXXXXXXXX');
+function track(event,params){try{gtag('event',event,params||{})}catch(e){}}
+</script>
+<meta name="google-adsense-account" content="ca-pub-4454035059273488">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4454035059273488"
+     crossorigin="anonymous"></script>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--red:#dc2626;--crimson:#7f1d1d;--gold:#f59e0b;--amber:#fbbf24;--dark:#0a0a0a;--card:rgba(255,255,255,.05)}
+body{font-family:'Pretendard Variable',system-ui,-apple-system,sans-serif;background:#0a0a0a;background-image:radial-gradient(ellipse at 20% 50%,rgba(220,38,38,.08) 0%,transparent 50%),radial-gradient(ellipse at 80% 20%,rgba(245,158,11,.06) 0%,transparent 50%);min-height:100dvh;color:#fff;overflow-x:hidden;-webkit-tap-highlight-color:transparent}
+/* Buttons */
+.btn{width:100%;max-width:360px;padding:18px;border:none;border-radius:16px;font-size:18px;font-weight:700;cursor:pointer;transition:all .2s;font-family:inherit}
+.btn-primary{background:linear-gradient(135deg,#dc2626,#f59e0b);color:#fff;box-shadow:0 8px 30px rgba(220,38,38,.3)}
+.btn-primary:active{transform:scale(.97)}
+.btn-secondary{background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.15);backdrop-filter:blur(10px)}
+.btn-small{padding:12px;font-size:15px;border-radius:12px}
+/* Result */
+.result-screen{display:flex;flex-direction:column;align-items:center;min-height:100dvh;padding:20px;padding-top:env(safe-area-inset-top,20px);padding-top:40px;gap:20px;padding-bottom:40px;background:radial-gradient(ellipse at 50% 20%,rgba(220,38,38,.18) 0%,transparent 55%),radial-gradient(ellipse at 50% 80%,rgba(245,158,11,.12) 0%,transparent 55%)}
+.result-card{background:rgba(20,20,20,.95);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.1);border-radius:24px;padding:36px 24px;width:100%;max-width:380px;color:#fff;text-align:center;box-shadow:0 0 60px rgba(220,38,38,.1),0 20px 60px rgba(0,0,0,.3)}
+.result-name{font-size:15px;color:#777;margin-bottom:8px}
+.result-object-emoji{font-size:80px;line-height:1;margin:4px 0}
+.result-size{font-size:84px;font-weight:900;color:#dc2626;background:linear-gradient(135deg,#dc2626,#e84a1e,#f59e0b);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;line-height:1}
+.result-unit{font-size:24px;font-weight:800;-webkit-text-fill-color:#999}
+.result-girth{font-size:15px;font-weight:700;color:#888;margin-top:4px}
+.result-girth span{color:#dc2626;font-size:18px;font-weight:900}
+.result-object-name{font-size:22px;font-weight:800;color:#fff;margin-top:8px}
+.result-object-desc{font-size:14px;color:#999;margin-top:2px}
+.result-percentile{margin:20px 0;padding:16px;background:rgba(255,255,255,.06);border-radius:16px}
+.percentile-text{font-size:13px;color:#888;margin-bottom:6px}
+.percentile-value{font-size:36px;font-weight:900;color:#dc2626}
+.percentile-bar{height:8px;background:rgba(255,255,255,.1);border-radius:4px;margin-top:8px;overflow:hidden}
+.percentile-bar-fill{height:100%;background:linear-gradient(90deg,#f59e0b,#dc2626);border-radius:4px;transition:width 1.5s ease}
+.result-factors{display:flex;gap:8px;margin-top:12px}
+.factor{flex:1;background:rgba(255,255,255,.06);border-radius:12px;padding:10px 6px;text-align:center}
+.factor-emoji{font-size:20px}
+.factor-label{font-size:10px;color:#777;margin-top:2px}
+.factor-value{font-size:13px;font-weight:700;color:#eee;margin-top:2px}
+.factor-value.positive{color:#f59e0b}
+.factor-value.negative{color:#ef4444}
+.result-divider{width:50px;height:2px;background:rgba(255,255,255,.1);margin:16px auto}
+.result-comment{margin:8px 0;padding:14px;background:rgba(220,38,38,.12);border:1px solid rgba(220,38,38,.2);border-radius:14px}
+.comment-main{font-size:17px;font-weight:800;color:#fff}
+.comment-sub{font-size:13px;color:#aaa;margin-top:4px}
+.result-factors-title{font-size:11px;color:#666;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px}
+.result-score{margin:16px 0;text-align:center}
+.result-score-label{font-size:13px;color:#888;margin-bottom:4px}
+.result-score-value{font-size:56px;font-weight:900;background:linear-gradient(135deg,#f59e0b,#dc2626);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:#f59e0b}
+.result-score-max{font-size:18px;-webkit-text-fill-color:#666;color:#666}
+.result-specs{display:flex;gap:12px;justify-content:center;margin:8px 0}
+.result-spec{text-align:center}
+.result-spec-val{font-size:36px;font-weight:900;color:#fff}
+.result-spec-label{font-size:13px;color:#777;margin-top:2px}
+.result-disclaimer{font-size:10px;color:#555;margin-top:16px}
+.result-watermark{font-size:11px;color:#444;margin-top:8px;letter-spacing:1px}
+.share-explain{font-size:12px;color:rgba(255,255,255,.4);text-align:center;line-height:1.5;margin:-4px 0 4px}
+/* Group Ranking */
+.ranking-section{width:100%;max-width:380px;background:rgba(220,38,38,.08);border:1px solid rgba(220,38,38,.2);backdrop-filter:blur(10px);border-radius:20px;padding:20px;margin-top:4px}
+.ranking-title{font-size:18px;font-weight:800;margin-bottom:12px;text-align:center}
+.ranking-list{display:flex;flex-direction:column;gap:8px}
+.ranking-item{display:flex;align-items:center;gap:12px;padding:10px 14px;background:rgba(255,255,255,.04);border-radius:12px}
+.ranking-item.me{background:rgba(220,38,38,.12);border:2px solid rgba(220,38,38,.35)}
+.ranking-pos{font-size:18px;font-weight:900;width:28px;text-align:center}
+.ranking-pos.gold{color:#fbbf24}
+.ranking-pos.silver{color:#d1d5db}
+.ranking-pos.bronze{color:#d97706}
+.ranking-name{flex:1;font-weight:600}
+.ranking-size{font-weight:800;font-size:17px}
+/* Share buttons */
+.share-buttons{width:100%;max-width:380px;display:flex;flex-direction:column;gap:10px}
+/* Fallback screen */
+.fallback{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100dvh;gap:24px;padding:20px;text-align:center}
+.fallback h2{font-size:28px;font-weight:800}
+.fallback p{font-size:15px;opacity:.7}
+/* Animations */
+@keyframes fadeInUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeInUp .5s ease both}
+.fade-in-d1{animation-delay:.1s}
+.fade-in-d2{animation-delay:.2s}
+.fade-in-d3{animation-delay:.3s}
+.fade-in-d4{animation-delay:.4s}
+.count-up{animation:countUp .6s cubic-bezier(.34,1.56,.64,1) both}
+@keyframes countUp{from{opacity:0;transform:scale(.5)}to{opacity:1;transform:scale(1)}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script>
+// ============ OBJECTS (for emoji/name lookup) ============
+const OBJECTS = [
+  {min:0,max:7.5,emoji:'🤙',name:'새끼손가락',desc:'...진짜 이게 끝? (6cm)'},
+  {min:7.5,max:9,emoji:'🧃',name:'소주잔',desc:'한잔 하시겠습니까 (8cm)'},
+  {min:9,max:10,emoji:'🖍️',name:'크레파스',desc:'유치원 때 쓰던 그거 (9cm)'},
+  {min:10,max:11,emoji:'🍤',name:'새우',desc:'구부리면 더 작아지는 (10cm)'},
+  {min:11,max:12,emoji:'🖱️',name:'마우스',desc:'손에 쥐면 딱 감싸지는 (11cm)'},
+  {min:12,max:12.5,emoji:'🍺',name:'캔맥주',desc:'시원하게 원샷 각 (12.2cm)'},
+  {min:12.5,max:13.2,emoji:'🌭',name:'프랑크소시지',desc:'빵 사이에 끼우면 딱 (13cm)'},
+  {min:13.2,max:14,emoji:'📱',name:'아이폰',desc:'항상 손에 쥐고 사는 (14cm)'},
+  {min:14,max:15,emoji:'📺',name:'리모컨',desc:'채널 돌리기 딱 좋은 (15cm)'},
+  {min:15,max:16.5,emoji:'🍌',name:'바나나',desc:'까면 진짜 달콤한 (16cm)'},
+  {min:16.5,max:18,emoji:'🍆',name:'가지',desc:'이모지계의 전설 (17cm)'},
+  {min:18,max:20,emoji:'🌽',name:'옥수수',desc:'알이 꽉 찬 대물급 (19cm)'},
+  {min:20,max:22,emoji:'🐍',name:'뱀',desc:'풀숲에서 나타나면 비명 (20cm)'},
+  {min:22,max:99,emoji:'🔫',name:'AK-47',desc:'이쯤 되면 무기입니다'}
+];
+
+function getObject(size) {
+  return OBJECTS.find(o => size >= o.min && size < o.max) || OBJECTS[OBJECTS.length - 1];
+}
+
+// ============ GROUP ENCODING ============
+function encodeGroup(members) {
+  try {
+    const data = members.map(m => `${m.name}|${m.size}`).join(',');
+    return btoa(unescape(encodeURIComponent(data)));
+  } catch { return ''; }
+}
+
+function decodeGroup(encoded) {
+  try {
+    const data = decodeURIComponent(escape(atob(encoded)));
+    return data.split(',').filter(Boolean).map(e => {
+      const [name, size] = e.split('|');
+      return { name, size: parseFloat(size) };
+    });
+  } catch { return []; }
+}
+
+// ============ RESULT STATE ============
+let resultData = null;
+
+function loadResult() {
+  try {
+    const raw = localStorage.getItem('gmd-result');
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch { return null; }
+}
+
+function renderResult(data) {
+  const { name, size, girth, percentile, totalScore, factors, obj, comment, group } = data;
+
+  const app = document.getElementById('app');
+  app.innerHTML = `
+    <div class="result-screen">
+      <div class="result-card fade-in" id="result-card">
+        <div class="result-name">${name}의 분석 결과</div>
+        <div class="result-object-emoji fade-in fade-in-d1">${obj.emoji}</div>
+        <div class="result-specs fade-in fade-in-d1">
+          <div class="result-spec">
+            <div class="result-spec-val">${size}</div>
+            <div class="result-spec-label">길이 (cm)</div>
+          </div>
+          <div class="result-spec" style="color:#555;font-size:24px;padding-top:4px">×</div>
+          <div class="result-spec">
+            <div class="result-spec-val">${girth}</div>
+            <div class="result-spec-label">둘레 (cm)</div>
+          </div>
+        </div>
+        <div class="result-score fade-in fade-in-d2">
+          <div class="result-score-label">총점</div>
+          <div><span class="result-score-value">${totalScore}</span><span class="result-score-max"> / 100</span></div>
+        </div>
+        <div class="result-object-name fade-in fade-in-d2">"${obj.name}" 사이즈</div>
+        <div class="result-object-desc fade-in fade-in-d2">${obj.desc}</div>
+        <div class="result-divider"></div>
+        <div class="result-percentile fade-in fade-in-d3">
+          <div class="percentile-text">전 세계 남성 기준</div>
+          <div class="percentile-value">상위 ${100 - percentile}%</div>
+          <div class="percentile-bar"><div class="percentile-bar-fill" id="r-pbar" style="width:0%"></div></div>
+        </div>
+        <div class="result-comment fade-in fade-in-d3">
+          <div class="comment-main">${comment.text}</div>
+          <div class="comment-sub">${comment.sub}</div>
+        </div>
+        <div class="result-divider"></div>
+        <div class="result-factors-title fade-in fade-in-d4">AI 분석 근거</div>
+        <div class="result-factors fade-in fade-in-d4">
+          ${(factors || []).map(f => `
+            <div class="factor">
+              <div class="factor-emoji">${f.emoji}</div>
+              <div class="factor-label">${f.label}</div>
+              <div class="factor-value ${f.value >= 0 ? 'positive' : 'negative'}">
+                ${f.value >= 0 ? '+' : ''}${(+f.value).toFixed(1)}cm
+              </div>
+            </div>
+          `).join('')}
+        </div>
+        <div class="result-disclaimer">* 발기 시 기준 예측 · 엔터테인먼트 목적</div>
+        <div class="result-watermark">GUESS MY DICK</div>
+      </div>
+      <div class="ranking-section fade-in fade-in-d3" id="ranking-section" style="display:none">
+        <div class="ranking-title">🏆 그룹 랭킹</div>
+        <div class="ranking-list" id="ranking-list"></div>
+      </div>
+      <div class="share-buttons fade-in fade-in-d4">
+        <button class="btn btn-primary" onclick="shareChallenge()">🔗 친구에게 도전장 보내기</button>
+        <p class="share-explain">링크를 받은 친구가 측정하면<br>자동으로 랭킹이 업데이트됩니다!</p>
+        <button class="btn btn-secondary" onclick="shareImage()">📸 결과 이미지 저장</button>
+        <button class="btn btn-secondary btn-small" onclick="location.href='index.html'">🔄 다시 측정하기</button>
+      </div>
+    </div>
+  `;
+
+  // Animate percentile bar
+  setTimeout(() => {
+    const pbar = document.getElementById('r-pbar');
+    if (pbar) pbar.style.width = percentile + '%';
+  }, 300);
+
+  // Render ranking
+  renderRanking(name, size, group);
+}
+
+function renderRanking(myName, mySize, group) {
+  if (!group || group.length <= 1) return;
+  const section = document.getElementById('ranking-section');
+  const list = document.getElementById('ranking-list');
+  if (!section || !list) return;
+
+  const medals = ['gold', 'silver', 'bronze'];
+  const icons = ['👑', '🥈', '🥉'];
+
+  list.innerHTML = group.map((m, i) => `
+    <div class="ranking-item ${m.name === myName ? 'me' : ''}">
+      <div class="ranking-pos ${medals[i] || ''}">${i < 3 ? icons[i] : (i+1)}</div>
+      <div class="ranking-name">${m.name} ${m.name === myName ? '← 나' : ''}</div>
+      <div class="ranking-size">${m.size}cm</div>
+    </div>
+  `).join('');
+
+  section.style.display = 'block';
+}
+
+function showFallback() {
+  document.getElementById('app').innerHTML = `
+    <div class="fallback">
+      <div style="font-size:64px">🍆</div>
+      <h2>결과를 찾을 수 없어요</h2>
+      <p>측정을 완료하면 결과가 여기에 표시됩니다</p>
+      <button class="btn btn-primary" onclick="location.href='index.html'" style="max-width:280px">측정하러 가기</button>
+    </div>
+  `;
+}
+
+async function shareChallenge() {
+  if (!resultData) return;
+  track('share_challenge', { score: resultData.totalScore, size: resultData.size });
+  const { group, size, girth, percentile } = resultData;
+  const obj = getObject(size);
+  const encoded = encodeGroup(group || []);
+  const base = window.location.origin + window.location.pathname.replace('result.html', 'index.html');
+  const url = base + (encoded ? '?g=' + encoded : '');
+  const text = `🍆 나는 상위 ${100 - percentile}%! 너는 몇 cm일까?\n길이: ${size}cm | 둘레: ${girth}cm\n${obj.emoji} "${obj.name}" 사이즈\n\n지금 측정해봐 👇`;
+
+  if (navigator.share) {
+    try {
+      await navigator.share({ title: 'Guess My Dick', text, url });
+      return;
+    } catch {}
+  }
+  try {
+    await navigator.clipboard.writeText(text + '\n' + url);
+    alert('링크가 복사되었습니다! 친구에게 보내주세요 🔗');
+  } catch {
+    prompt('아래 링크를 복사해서 공유하세요:', url);
+  }
+}
+
+async function shareImage() {
+  if (!resultData) return;
+  track('share_image', { score: resultData.totalScore, size: resultData.size });
+  try {
+    const card = document.getElementById('result-card');
+    const canvas = await html2canvas(card, {
+      backgroundColor: '#ffffff',
+      scale: 2,
+      useCORS: true,
+      logging: false
+    });
+
+    canvas.toBlob(async (blob) => {
+      if (navigator.share && navigator.canShare) {
+        const file = new File([blob], 'guess-my-dick.png', { type: 'image/png' });
+        if (navigator.canShare({ files: [file] })) {
+          try {
+            await navigator.share({ files: [file], title: 'Guess My Dick 결과' });
+            return;
+          } catch {}
+        }
+      }
+      // Fallback: download
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `guess-my-dick-${resultData.name || 'result'}.png`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }, 'image/png');
+  } catch (e) {
+    console.error(e);
+    alert('이미지 생성에 실패했습니다');
+  }
+}
+
+// ============ INIT ============
+document.addEventListener('DOMContentLoaded', () => {
+  resultData = loadResult();
+  if (!resultData) {
+    showFallback();
+    return;
+  }
+  renderResult(resultData);
+  track('result_page_viewed', {
+    size: resultData.size,
+    girth: resultData.girth,
+    total_score: resultData.totalScore,
+    percentile: resultData.percentile
+  });
+});
+</script>
+</body>
+</html>
