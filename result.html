@@ -267,16 +267,16 @@ async function shareChallenge() {
   const encoded = encodeGroup(group || []);
   const base = window.location.origin + window.location.pathname.replace('result.html', 'index.html');
   const url = base + (encoded ? '?g=' + encoded : '');
-  const text = `${obj.emoji} "${obj.name}" 사이즈래 ㅋㅋ\n나는 상위 ${100 - percentile}%!\n\n과연 나는 친구 중 몇 위..? 👇`;
+  const text = `${obj.emoji} "${obj.name}" 사이즈래 ㅋㅋ\n나는 상위 ${100 - percentile}%!\n\n과연 나는 친구 중 몇 위..? 👇\n${url}`;
 
   if (navigator.share) {
     try {
-      await navigator.share({ title: 'Guess My Dick', text, url });
+      await navigator.share({ text });
       return;
     } catch {}
   }
   try {
-    await navigator.clipboard.writeText(text + '\n' + url);
+    await navigator.clipboard.writeText(text);
     alert('링크가 복사되었습니다! 친구에게 보내주세요 🔗');
   } catch {
     prompt('아래 링크를 복사해서 공유하세요:', url);
