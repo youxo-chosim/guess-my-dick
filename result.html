@@ -290,19 +290,44 @@ async function shareImage() {
   track('share_image', { score: resultData.totalScore, size: resultData.size });
   try {
     const card = document.getElementById('result-card');
-    // Temporarily make card solid for screenshot
-    const origBg = card.style.background;
-    const origBackdrop = card.style.backdropFilter;
+    // Force solid colors for html2canvas (can't render rgba/gradients/backdrop-filter)
     card.style.background = '#141414';
     card.style.backdropFilter = 'none';
+    card.style.webkitBackdropFilter = 'none';
+    card.style.boxShadow = 'none';
+    // Fix gradient text - make solid color
+    card.querySelectorAll('*').forEach(el => {
+      const cs = getComputedStyle(el);
+      if (cs.webkitTextFillColor === 'transparent' || cs.color === 'transparent') {
+        el.dataset.origColor = el.style.color;
+        el.dataset.origFill = el.style.webkitTextFillColor;
+        el.dataset.origBg = el.style.background;
+        el.style.webkitTextFillColor = '';
+        el.style.background = 'none';
+        el.style.color = '#dc2626';
+      }
+      if (cs.backgroundColor.includes('rgba')) {
+        el.dataset.origBgc = el.style.backgroundColor;
+        el.style.backgroundColor = cs.backgroundColor.replace(/[\d.]+\)$/, '1)');
+      }
+    });
     const canvas = await html2canvas(card, {
       backgroundColor: '#0a0a0a',
       scale: 2,
       useCORS: true,
       logging: false
     });
-    card.style.background = origBg;
-    card.style.backdropFilter = origBackdrop;
+    // Restore original styles
+    card.style.background = '';
+    card.style.backdropFilter = '';
+    card.style.webkitBackdropFilter = '';
+    card.style.boxShadow = '';
+    card.querySelectorAll('[data-orig-color],[data-orig-fill],[data-orig-bgc]').forEach(el => {
+      if (el.dataset.origFill !== undefined) el.style.webkitTextFillColor = el.dataset.origFill;
+      if (el.dataset.origColor !== undefined) el.style.color = el.dataset.origColor;
+      if (el.dataset.origBg !== undefined) el.style.background = el.dataset.origBg;
+      if (el.dataset.origBgc !== undefined) el.style.backgroundColor = el.dataset.origBgc;
+    });
 
     canvas.toBlob(async (blob) => {
       if (navigator.share && navigator.canShare) {
