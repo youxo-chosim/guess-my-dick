@@ -267,7 +267,7 @@ async function shareChallenge() {
   const encoded = encodeGroup(group || []);
   const base = window.location.origin + window.location.pathname.replace('result.html', 'index.html');
   const url = base + (encoded ? '?g=' + encoded : '');
-  const text = `${obj.emoji} "${obj.name}" 사이즈래 ㅋㅋ\n나는 상위 ${100 - percentile}%!\n\n⚔️ 칼싸움 한판 할? 👇`;
+  const text = `${obj.emoji} "${obj.name}" 사이즈래 ㅋㅋ\n나는 상위 ${100 - percentile}%!\n\n과연 나는 친구 중 몇 위..? 👇`;
 
   if (navigator.share) {
     try {
