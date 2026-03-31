@@ -71,7 +71,7 @@ select option{color:#333;background:#fff}
 .camera-wrap canvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none}
 .face-guide{position:absolute;top:50%;left:50%;transform:translate(-50%,-55%);width:55%;height:55%;border:3px dashed rgba(255,255,255,.5);border-radius:50%;pointer-events:none;transition:border-color .3s,border-style .3s}
 .face-guide.detected{border-color:#10b981;border-style:solid;box-shadow:inset 0 0 30px rgba(16,185,129,.15)}
-.face-guide::after{content:'정면을 바라봐주세요';position:absolute;bottom:-36px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:13px;opacity:.7}
+.face-guide::after{content:attr(data-label);position:absolute;bottom:-36px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:13px;opacity:.7}
 .countdown-display{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:72px;font-weight:900;color:#10b981;text-shadow:0 0 30px rgba(16,185,129,.5);z-index:10;pointer-events:none;animation:countUp .4s cubic-bezier(.34,1.56,.64,1)}
 .hand-guide{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:60%;height:70%;pointer-events:none;display:flex;flex-direction:column;align-items:center;justify-content:center}
 .hand-guide svg{width:100%;height:100%;opacity:.35}
@@ -140,35 +140,35 @@ select option{color:#333;background:#fff}
 <!-- Screen: Age Gate -->
 <section class="screen active age-gate" id="s-age">
   <div style="font-size:64px">🔞</div>
-  <h2>만 18세 이상입니까?</h2>
-  <p style="opacity:.7;font-size:15px">본 서비스는 성인 전용 엔터테인먼트입니다</p>
+  <h2 data-i18n="age_title">만 18세 이상입니까?</h2>
+  <p style="opacity:.7;font-size:15px" data-i18n="age_desc">본 서비스는 성인 전용 엔터테인먼트입니다</p>
   <div class="age-buttons">
-    <button class="btn btn-primary" onclick="App.confirmAge()">네</button>
-    <button class="btn btn-secondary" onclick="App.denyAge()">아니오</button>
+    <button class="btn btn-primary" onclick="App.confirmAge()" data-i18n="age_yes">네</button>
+    <button class="btn btn-secondary" onclick="App.denyAge()" data-i18n="age_no">아니오</button>
   </div>
 </section>
 
 <!-- Screen: Landing -->
 <section class="screen landing" id="s-landing">
-  <div class="logo">남자의 진실</div>
+  <div class="logo" data-i18n="logo">남자의 진실</div>
   <div>
     <h1 class="hero-title">GUESS MY<span>DICK</span></h1>
   </div>
-  <p class="hero-sub">까기 전엔 아무도 모른다<br>하지만 <strong>우린 안다</strong></p>
-  <div class="hero-counter" id="hero-counter">🔥 <strong>247,832</strong>명이 이미 털림</div>
+  <p class="hero-sub" data-i18n="hero_sub">까기 전엔 아무도 모른다<br>하지만 <strong>우린 안다</strong></p>
+  <div class="hero-counter" id="hero-counter" data-i18n="hero_counter">🔥 <strong>247,832</strong>명이 이미 털림</div>
   <div class="hero-tags">
-    <span class="tag">👀 얼굴만 봐도 안다</span>
-    <span class="tag">✋ 손이 말해준다</span>
-    <span class="tag">🍆 친구보다 클까?</span>
+    <span class="tag" data-i18n="tag1">👀 얼굴만 봐도 안다</span>
+    <span class="tag" data-i18n="tag2">✋ 손이 말해준다</span>
+    <span class="tag" data-i18n="tag3">🍆 친구보다 클까?</span>
   </div>
   <div id="group-invite" class="group-invite" style="display:none">
-    <h3>🔥 친구들이 도전장을 보냈습니다!</h3>
+    <h3 data-i18n="invite_title">🔥 친구들이 도전장을 보냈습니다!</h3>
     <div class="ranking-preview" id="invite-preview"></div>
   </div>
-  <button class="btn btn-primary" onclick="App.start()" style="font-size:20px">
+  <button class="btn btn-primary" onclick="App.start()" style="font-size:20px" data-i18n="start">
     측정 시작하기
   </button>
-  <p style="font-size:12px;opacity:.5">무료 · 사진은 서버에 저장되지 않습니다</p>
+  <p style="font-size:12px;opacity:.5" data-i18n="start_disclaimer">무료 · 사진은 서버에 저장되지 않습니다</p>
 </section>
 
 <!-- Screen: Basic Info -->
@@ -177,30 +177,30 @@ select option{color:#333;background:#fff}
   <div class="progress-bar"><div class="progress-fill" style="width:25%"></div></div>
   <div class="step-header">
     <div class="step-num">STEP 1 OF 4</div>
-    <h2 class="step-title">기본 정보</h2>
-    <p class="step-desc">정확한 예측을 위해 입력해주세요</p>
+    <h2 class="step-title" data-i18n="step1_title">기본 정보</h2>
+    <p class="step-desc" data-i18n="step1_desc">정확한 예측을 위해 입력해주세요</p>
   </div>
   <div class="form-group">
     <div class="input-wrap">
-      <label>이름 (닉네임)</label>
-      <input id="inp-name" placeholder="결과에 표시될 이름" maxlength="10">
+      <label data-i18n="label_name">이름 (닉네임)</label>
+      <input id="inp-name" placeholder="결과에 표시될 이름" data-i18n-ph="ph_name" maxlength="10">
     </div>
     <div class="input-wrap">
-      <label>국가</label>
+      <label data-i18n="label_country">국가</label>
       <select id="inp-country"></select>
     </div>
     <div class="row">
       <div class="input-wrap">
-        <label>키 (cm)</label>
+        <label data-i18n="label_height">키 (cm)</label>
         <input id="inp-height" type="number" placeholder="170" min="130" max="220">
       </div>
       <div class="input-wrap">
-        <label>몸무게 (kg)</label>
+        <label data-i18n="label_weight">몸무게 (kg)</label>
         <input id="inp-weight" type="number" placeholder="70" min="30" max="200">
       </div>
     </div>
   </div>
-  <button class="btn btn-primary" onclick="App.submitInfo()">다음</button>
+  <button class="btn btn-primary" onclick="App.submitInfo()" data-i18n="btn_next">다음</button>
 </section>
 
 <!-- Screen: Face Camera -->
@@ -209,18 +209,18 @@ select option{color:#333;background:#fff}
   <div class="progress-bar"><div class="progress-fill" style="width:50%"></div></div>
   <div class="step-header">
     <div class="step-num">STEP 2 OF 4</div>
-    <h2 class="step-title">얼굴 촬영</h2>
+    <h2 class="step-title" data-i18n="step2_title">얼굴 촬영</h2>
   </div>
   <div class="camera-wrap">
     <video id="face-video" autoplay playsinline muted></video>
     <canvas id="face-overlay"></canvas>
-    <div class="face-guide"></div>
+    <div class="face-guide" data-label="정면을 바라봐주세요"></div>
     <div class="camera-status" id="face-status">카메라 로딩 중...</div>
   </div>
   <div class="camera-actions">
     <button class="capture-btn" id="face-capture-btn" onclick="App.captureFace()"></button>
   </div>
-  <button class="upload-btn" onclick="document.getElementById('face-upload').click()">📁 앨범에서 선택</button>
+  <button class="upload-btn" onclick="document.getElementById('face-upload').click()">📁 <span data-i18n="upload">앨범에서 선택</span></button>
   <input type="file" id="face-upload" accept="image/*" style="display:none" onchange="App.uploadFace(event)">
   <p style="font-size:12px;opacity:.5;margin-top:4px">사진은 기기에서만 처리됩니다</p>
 </section>
@@ -231,8 +231,8 @@ select option{color:#333;background:#fff}
   <div class="progress-bar"><div class="progress-fill" style="width:75%"></div></div>
   <div class="step-header">
     <div class="step-num">STEP 3 OF 4</div>
-    <h2 class="step-title">오른손 촬영</h2>
-    <p class="step-desc">오른손 손바닥을 펴고 손가락을 벌려주세요<br><span style="font-size:12px;opacity:.6">* 과학 논문 기준: 오른손 검지/약지 비율 측정</span></p>
+    <h2 class="step-title" data-i18n="step3_title">오른손 촬영</h2>
+    <p class="step-desc"><span data-i18n="step3_desc">오른손 손바닥을 펴고 손가락을 벌려주세요</span><br><span style="font-size:12px;opacity:.6" data-i18n="step3_note">* 과학 논문 기준: 오른손 검지/약지 비율 측정</span></p>
   </div>
   <div class="camera-wrap">
     <video id="hand-video" autoplay playsinline muted></video>
@@ -243,7 +243,7 @@ select option{color:#333;background:#fff}
   <div class="camera-actions">
     <button class="capture-btn" id="hand-capture-btn" onclick="App.captureHand()"></button>
   </div>
-  <button class="upload-btn" onclick="document.getElementById('hand-upload').click()">📁 앨범에서 선택</button>
+  <button class="upload-btn" onclick="document.getElementById('hand-upload').click()">📁 <span data-i18n="upload">앨범에서 선택</span></button>
   <input type="file" id="hand-upload" accept="image/*" style="display:none" onchange="App.uploadHand(event)">
 </section>
 
@@ -252,13 +252,13 @@ select option{color:#333;background:#fff}
   <div class="progress-bar"><div class="progress-fill" style="width:100%"></div></div>
   <div class="analyzing">
     <div class="spinner"></div>
-    <h2 style="font-size:24px;font-weight:800">AI 분석 중</h2>
+    <h2 style="font-size:24px;font-weight:800" data-i18n="analyzing">AI 분석 중</h2>
     <div class="analysis-steps" id="analysis-steps">
-      <div class="analysis-step" data-step="0">얼굴 특징 추출 중...</div>
-      <div class="analysis-step" data-step="1">코 비율 측정 중...</div>
-      <div class="analysis-step" data-step="2">손가락 비율 계산 중...</div>
-      <div class="analysis-step" data-step="3">신체 데이터 종합 중...</div>
-      <div class="analysis-step" data-step="4">AI 예측 모델 적용 중...</div>
+      <div class="analysis-step" data-step="0" data-i18n="a_step0">얼굴 특징 추출 중...</div>
+      <div class="analysis-step" data-step="1" data-i18n="a_step1">코 비율 측정 중...</div>
+      <div class="analysis-step" data-step="2" data-i18n="a_step2">손가락 비율 계산 중...</div>
+      <div class="analysis-step" data-step="3" data-i18n="a_step3">신체 데이터 종합 중...</div>
+      <div class="analysis-step" data-step="4" data-i18n="a_step4">AI 예측 모델 적용 중...</div>
     </div>
     <button class="btn btn-primary" id="btn-reveal" style="display:none;font-size:20px;margin-top:16px" onclick="App.goToResult()">결과 확인하기! 🍆</button>
   </div>
@@ -268,6 +268,86 @@ select option{color:#333;background:#fff}
 </div>
 
 <script>
+// ============ I18N ============
+const isKo = navigator.language?.startsWith('ko') ?? true;
+const T = {
+  age_title: isKo ? '만 18세 이상입니까?' : 'Are you over 18?',
+  age_desc: isKo ? '본 서비스는 성인 전용 엔터테인먼트입니다' : 'This service is adult entertainment only',
+  age_yes: isKo ? '네' : 'Yes',
+  age_no: isKo ? '아니오' : 'No',
+  age_deny: isKo ? '만 18세 이상만 이용 가능합니다.' : 'You must be 18 or older.',
+  logo: isKo ? '남자의 진실' : 'THE TRUTH ABOUT MEN',
+  hero_sub: isKo ? '까기 전엔 아무도 모른다<br>하지만 <strong>우린 안다</strong>' : 'Nobody knows until you unwrap it<br>But <strong>we know</strong>',
+  hero_counter: isKo ? '🔥 <strong>247,832</strong>명이 이미 털림' : '🔥 <strong>247,832</strong> already measured',
+  tag1: isKo ? '👀 얼굴만 봐도 안다' : '👀 Your face says it all',
+  tag2: isKo ? '✋ 손이 말해준다' : '✋ Your hands reveal it',
+  tag3: isKo ? '🍆 친구보다 클까?' : '🍆 Bigger than your friends?',
+  invite_title: isKo ? '🔥 친구들이 도전장을 보냈습니다!' : '🔥 Your friends challenged you!',
+  start: isKo ? '측정 시작하기' : 'Start Measuring',
+  start_disclaimer: isKo ? '무료 · 사진은 서버에 저장되지 않습니다' : 'Free · Photos are processed on your device only',
+  step1_title: isKo ? '기본 정보' : 'Basic Info',
+  step1_desc: isKo ? '정확한 예측을 위해 입력해주세요' : 'Enter your info for accurate prediction',
+  label_name: isKo ? '이름 (닉네임)' : 'Name (nickname)',
+  ph_name: isKo ? '결과에 표시될 이름' : 'Name shown in results',
+  label_country: isKo ? '국가' : 'Country',
+  label_height: isKo ? '키 (cm)' : 'Height (cm)',
+  label_weight: isKo ? '몸무게 (kg)' : 'Weight (kg)',
+  btn_next: isKo ? '다음' : 'Next',
+  step2_title: isKo ? '얼굴 촬영' : 'Face Scan',
+  step3_title: isKo ? '오른손 촬영' : 'Right Hand Scan',
+  step3_desc: isKo ? '오른손 손바닥을 펴고 손가락을 벌려주세요' : 'Open your right palm and spread your fingers',
+  step3_note: isKo ? '* 과학 논문 기준: 오른손 검지/약지 비율 측정' : '* Based on studies: right hand index/ring finger ratio',
+  upload: isKo ? '📁 <span data-i18n="upload">앨범에서 선택</span>' : '📁 Choose from gallery',
+  photo_disclaimer: isKo ? '사진은 기기에서만 처리됩니다' : 'Photos are processed on your device only',
+  analyzing: isKo ? 'AI 분석 중' : 'AI Analyzing',
+  a_step0: isKo ? '얼굴 특징 추출 중...' : 'Extracting facial features...',
+  a_step1: isKo ? '코 비율 측정 중...' : 'Measuring nose ratio...',
+  a_step2: isKo ? '손가락 비율 계산 중...' : 'Calculating finger ratio...',
+  a_step3: isKo ? '신체 데이터 종합 중...' : 'Combining body data...',
+  a_step4: isKo ? 'AI 예측 모델 적용 중...' : 'Applying AI prediction model...',
+  face_loading: isKo ? '카메라 로딩 중...' : 'Loading camera...',
+  face_guide: isKo ? '얼굴을 가이드 안에 맞춰주세요' : 'Align your face in the guide',
+  face_guide_label: isKo ? '정면을 바라봐주세요' : 'Look straight ahead',
+  hand_guide_label: isKo ? '손바닥을 가이드에 맞춰주세요' : 'Align your palm to the guide',
+  model_loading: isKo ? '모델 로딩 중...' : 'Loading model...',
+  scan: isKo ? '스캔 중...' : 'Scanning...',
+  face_success: isKo ? '✓ 얼굴 분석 완료!' : '✓ Face analysis complete!',
+  hand_success: isKo ? '✓ 손 분석 완료!' : '✓ Hand analysis complete!',
+  face_fail: isKo ? '얼굴이 감지되지 않았습니다' : 'Face not detected',
+  hand_fail: isKo ? '손이 감지되지 않았습니다' : 'Hand not detected',
+  face_center: isKo ? '얼굴을 가운데로 맞춰주세요' : 'Center your face',
+  face_closer: isKo ? '카메라에 더 가까이 와주세요' : 'Move closer to the camera',
+  face_farther: isKo ? '카메라에서 조금 떨어져주세요' : 'Move back from the camera',
+  face_analyzing: isKo ? '얼굴 분석 중...' : 'Analyzing face...',
+  auto_capture: isKo ? '✓ 자동 촬영!' : '✓ Auto captured!',
+  retry: isKo ? '다시 촬영해주세요' : 'Please try again',
+  cam_error: isKo ? '카메라 접근이 필요합니다' : 'Camera access required',
+  validate_name: isKo ? '이름을 입력해주세요' : 'Please enter your name',
+  validate_height: isKo ? '키를 정확히 입력해주세요 (130-220cm)' : 'Please enter valid height (130-220cm)',
+  validate_weight: isKo ? '몸무게를 정확히 입력해주세요 (30-200kg)' : 'Please enter valid weight (30-200kg)',
+  nose_ratio: isKo ? '코 비율' : 'Nose',
+  finger_ratio: isKo ? '손가락' : 'Finger',
+  body: isKo ? '신체' : 'Body',
+  body_bonus: isKo ? '체형 보너스' : 'Build bonus',
+};
+
+function applyI18n() {
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.dataset.i18n;
+    if (T[key]) el.innerHTML = T[key];
+  });
+  document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+    const key = el.dataset.i18nPh;
+    if (T[key]) el.placeholder = T[key];
+  });
+  // Face guide label
+  const fg = document.querySelector('.face-guide');
+  if (fg) fg.dataset.label = T.face_guide_label;
+  // Hand guide label
+  const hg = document.querySelector('.hand-guide');
+  if (hg) hg.dataset.label = T.hand_guide_label;
+}
+
 // ============ CONSTANTS ============
 // MediaPipe Face Mesh - loaded dynamically
 
@@ -770,7 +850,7 @@ function calculateResult() {
     const dev = (state.noseRatio - avgNoseRatio) / 0.03;
     const adj = dev * 1.0;
     predicted += adj;
-    factors.push({ emoji:'👃', label:'코 비율', value: adj });
+    factors.push({ emoji:'👃', label:T.nose_ratio, value: adj });
   }
 
   // 2. Finger factor (weight: 20%, r=0.216)
@@ -779,14 +859,14 @@ function calculateResult() {
     const dev = (avgRatio - state.fingerRatio) / 0.04; // SD=0.04, lower = bigger
     const adj = dev * 0.5;
     predicted += adj;
-    factors.push({ emoji:'✋', label:'손가락', value: adj });
+    factors.push({ emoji:'✋', label:T.finger_ratio, value: adj });
   }
 
   // 3. Height factor (weight: 25%)
   const heightDev = (state.height - c.h) / 7;
   const heightAdj = heightDev * 0.5;
   predicted += heightAdj;
-  factors.push({ emoji:'📏', label:'신체', value: heightAdj });
+  factors.push({ emoji:'📏', label:T.body, value: heightAdj });
 
   // 4. BMI factor (weight: 10%)
   const bmi = state.weight / ((state.height / 100) ** 2);
@@ -800,7 +880,7 @@ function calculateResult() {
   if (isTall && isLean) {
     const synergy = ((state.height - c.h) / 10) * ((22 - bmi) / 5) * 0.4;
     predicted += Math.min(synergy, 1.5); // 최대 1.5cm 보너스
-    factors.push({ emoji:'🦒', label:'체형 보너스', value: Math.min(synergy, 1.5) });
+    factors.push({ emoji:'🦒', label:T.body_bonus, value: Math.min(synergy, 1.5) });
   }
 
   // 6. Positive bias for shareability (bigger = more shares)
@@ -867,7 +947,7 @@ function showScreen(id) {
 // ============ APP ============
 const App = {
   confirmAge() { track('age_confirmed'); showScreen('s-landing'); },
-  denyAge() { track('age_denied'); alert('만 18세 이상만 이용 가능합니다.'); },
+  denyAge() { track('age_denied'); alert(T.age_deny); },
 
   start() {
     track('start_clicked', { is_group_invite: state.group.length > 0 });
@@ -889,9 +969,9 @@ const App = {
     const height = parseInt(document.getElementById('inp-height').value);
     const weight = parseInt(document.getElementById('inp-weight').value);
 
-    if (!name) { alert('이름을 입력해주세요'); return; }
-    if (!height || height < 130 || height > 220) { alert('키를 정확히 입력해주세요 (130-220cm)'); return; }
-    if (!weight || weight < 30 || weight > 200) { alert('몸무게를 정확히 입력해주세요 (30-200kg)'); return; }
+    if (!name) { alert(T.validate_name); return; }
+    if (!height || height < 130 || height > 220) { alert(T.validate_height); return; }
+    if (!weight || weight < 30 || weight > 200) { alert(T.validate_weight); return; }
 
     Object.assign(state, { name, country, height, weight });
     track('info_submitted', { country, height, weight });
@@ -1620,6 +1700,9 @@ const App = {
 
 // ============ INIT ============
 document.addEventListener('DOMContentLoaded', () => {
+  // Apply translations
+  applyI18n();
+
   // Load Google Sheet data (async, non-blocking)
   loadFromSheet();
 

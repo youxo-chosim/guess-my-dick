@@ -103,29 +103,55 @@ body{font-family:'Pretendard Variable',system-ui,-apple-system,sans-serif;backgr
 
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script>
+// ============ I18N ============
+const isKo = navigator.language?.startsWith('ko') ?? true;
+const RT = {
+  result_of: isKo ? '의 분석 결과' : "'s Result",
+  length_cm: isKo ? '길이 (cm)' : 'Length (cm)',
+  girth_cm: isKo ? '둘레 (cm)' : 'Girth (cm)',
+  total: isKo ? '총점' : 'Score',
+  size_suffix: isKo ? ' 사이즈' : ' size',
+  worldwide: isKo ? '전 세계 남성 기준' : 'Among all men worldwide',
+  top: isKo ? '상위 ' : 'Top ',
+  ai_basis: isKo ? 'AI 분석 근거' : 'AI Analysis Basis',
+  disclaimer: isKo ? '* 발기 시 기준 예측 · 엔터테인먼트 목적' : '* Erect estimate · Entertainment only',
+  ranking_title: isKo ? '🏆 그룹 랭킹' : '🏆 Group Ranking',
+  me: isKo ? '← 나' : '← Me',
+  share_btn: isKo ? '🔗 친구에게 도전장 보내기' : '🔗 Challenge your friends',
+  share_taunt: isKo ? '공유 안 하는 사나이들...<br>뭐 딱 봐도 결과 알겠제~ 🤭<br><span style="font-size:11px;opacity:.5">크게 나올 때까지 반복하는 소리 들린다~</span>' : "Not sharing? 🤭<br>We already know why...<br><span style='font-size:11px;opacity:.5'>Probably retrying until it's bigger~</span>",
+  save_img: isKo ? '📸 결과 이미지 저장' : '📸 Save Result Image',
+  restart: isKo ? '🔄 다시 측정하기' : '🔄 Measure Again',
+  share_text_suffix: isKo ? '과연 나는 친구 중 몇 위..? 👇' : 'Where do I rank among friends..? 👇',
+  share_size: isKo ? '사이즈래 ㅋㅋ' : 'size lol',
+  share_top: isKo ? '나는 상위 ' : "I'm top ",
+  link_copied: isKo ? '링크가 복사되었습니다! 친구에게 보내주세요 🔗' : 'Link copied! Send it to your friends 🔗',
+  link_prompt: isKo ? '아래 링크를 복사해서 공유하세요:' : 'Copy this link to share:',
+  img_fail: isKo ? '이미지 저장 실패' : 'Image save failed',
+};
+
 // ============ OBJECTS (for emoji/name lookup) ============
 const OBJECTS = [
-  {min:0,max:7.5,emoji:'🤙',name:'새끼손가락',desc:'...진짜 이게 끝? (6cm)'},
-  {min:7.5,max:9,emoji:'🧃',name:'소주잔',desc:'한잔 하시겠습니까 (8cm)'},
-  {min:9,max:10,emoji:'🖍️',name:'크레파스',desc:'유치원 때 쓰던 그거 (9cm)'},
-  {min:10,max:11,emoji:'🍤',name:'새우',desc:'구부리면 더 작아지는 (10cm)'},
-  {min:11,max:12,emoji:'🖱️',name:'마우스',desc:'손에 쥐면 딱 감싸지는 (11cm)'},
-  {min:12,max:12.5,emoji:'🍺',name:'캔맥주',desc:'시원하게 원샷 각 (12.2cm)'},
-  {min:12.5,max:13.2,emoji:'🌭',name:'프랑크소시지',desc:'빵 사이에 끼우면 딱 (13cm)'},
-  {min:13.2,max:14,emoji:'📱',name:'아이폰',desc:'항상 손에 쥐고 사는 (14cm)'},
-  {min:14,max:15,emoji:'📺',name:'리모컨',desc:'채널 돌리기 딱 좋은 (15cm)'},
-  {min:15,max:16.5,emoji:'🍌',name:'바나나',desc:'까면 진짜 달콤한 (16cm)'},
-  {min:16.5,max:18,emoji:'🍆',name:'가지',desc:'이모지계의 전설 (17cm)'},
-  {min:18,max:20,emoji:'🌽',name:'옥수수',desc:'알이 꽉 찬 대물급 (19cm)'},
-  {min:20,max:22,emoji:'🐍',name:'뱀',desc:'풀숲에서 나타나면 비명 (20cm)'},
-  {min:22,max:99,emoji:'🔫',name:'AK-47',desc:'이쯤 되면 무기입니다'}
+  {min:0,max:7.5,emoji:'🤙',name:isKo?'새끼손가락':'Pinky finger',desc:isKo?'...진짜 이게 끝? (6cm)':'...is that it? (6cm)'},
+  {min:7.5,max:9,emoji:'🧃',name:isKo?'소주잔':'Shot glass',desc:isKo?'한잔 하시겠습니까 (8cm)':'Cheers? (8cm)'},
+  {min:9,max:10,emoji:'🖍️',name:isKo?'크레파스':'Crayon',desc:isKo?'유치원 때 쓰던 그거 (9cm)':'Kindergarten throwback (9cm)'},
+  {min:10,max:11,emoji:'🍤',name:isKo?'새우':'Shrimp',desc:isKo?'구부리면 더 작아지는 (10cm)':'Curls up even smaller (10cm)'},
+  {min:11,max:12,emoji:'🖱️',name:isKo?'마우스':'Mouse',desc:isKo?'손에 쥐면 딱 감싸지는 (11cm)':'Fits right in your hand (11cm)'},
+  {min:12,max:12.5,emoji:'🍺',name:isKo?'캔맥주':'Beer can',desc:isKo?'시원하게 원샷 각 (12.2cm)':'Chug it in one go (12cm)'},
+  {min:12.5,max:13.2,emoji:'🌭',name:isKo?'프랑크소시지':'Hot dog',desc:isKo?'빵 사이에 끼우면 딱 (13cm)':'Fits in a bun (13cm)'},
+  {min:13.2,max:14,emoji:'📱',name:isKo?'아이폰':'iPhone',desc:isKo?'항상 손에 쥐고 사는 (14cm)':'Always in your hand (14cm)'},
+  {min:14,max:15,emoji:'📺',name:isKo?'리모컨':'TV remote',desc:isKo?'채널 돌리기 딱 좋은 (15cm)':'Perfect for channel surfing (15cm)'},
+  {min:15,max:16.5,emoji:'🍌',name:isKo?'바나나':'Banana',desc:isKo?'까면 진짜 달콤한 (16cm)':'Peel it and it\'s sweet (16cm)'},
+  {min:16.5,max:18,emoji:'🍆',name:isKo?'가지':'Eggplant',desc:isKo?'이모지계의 전설 (17cm)':'The legendary emoji (17cm)'},
+  {min:18,max:20,emoji:'🌽',name:isKo?'옥수수':'Corn',desc:isKo?'알이 꽉 찬 대물급 (19cm)':'Full and thick (19cm)'},
+  {min:20,max:22,emoji:'🐍',name:isKo?'뱀':'Snake',desc:isKo?'풀숲에서 나타나면 비명 (20cm)':'Screams in the bushes (20cm)'},
+  {min:22,max:99,emoji:'🔫',name:'AK-47',desc:isKo?'이쯤 되면 무기입니다':'This is a weapon at this point'}
 ];
 
 function getObject(size) {
   return OBJECTS.find(o => size >= o.min && size < o.max) || OBJECTS[OBJECTS.length - 1];
 }
 
-const COMMENTS = [
+const COMMENTS = isKo ? [
   {min:97,pool:[{text:'야 이거 실화냐... 🤯',sub:'이 정도면 흉기소지죄 적용 가능'},{text:'경찰에 신고해야 하나 📞',sub:'위험물 소지 혐의'},{text:'이걸로 뭘 하시는 거예요...',sub:'소방관이 필요한 사이즈'}]},
   {min:93,pool:[{text:'형... 존경합니다 🫡',sub:'인생 이겼다 그냥'},{text:'여친이 친구들한테 자랑할 사이즈 📢',sub:'"우리 오빠가..." 시전 가능'},{text:'축하합니다 유전자 복권 1등 🎰',sub:'부모님 감사 전화 ㄱㄱ'}]},
   {min:88,pool:[{text:'이 정도면 바지 핏이 다르겠네 👖',sub:'스키니진 포기하셨죠?'},{text:'꽤 쓸만하시네요? 😏',sub:'자주 쓰시나 봐요'},{text:'솔직히 부럽다... 👏',sub:'인정할 건 인정'}]},
@@ -139,6 +165,20 @@ const COMMENTS = [
   {min:15,pool:[{text:'ㅋㅋ 솔직히 좀... 많이 작음 📏',sub:'현실을 직시합시다'},{text:'돈을 많이 벌어야겠다 💰',sub:'진짜로. 진심으로.'},{text:'포켓 사이즈라고 하자 👛',sub:'긍정의 힘'}]},
   {min:8,pool:[{text:'혹시... 여자...? 🤔',sub:'아닌가? 미안'},{text:'AI가 측정을 포기했습니다 🤖',sub:'ERROR 404: SIZE NOT FOUND'},{text:'이건 뭐 ㅋㅋ 할 말을 잃었 💬',sub:'무슨 말을 해야...'}]},
   {min:0,pool:[{text:'이 결과를 공유하면 당신은 용자 🫡',sub:'존경합니다 진심으로'},{text:'중요한 건 꺾이지 않는 마음 💪',sub:'물리적으로는 꺾일 수도'},{text:'성격이 좋으면 됩니다 😇',sub:'...그쵸?'}]}
+] : [
+  {min:97,pool:[{text:'Is this even real?! 🤯',sub:'This should be classified as a weapon'},{text:'Call the police 📞',sub:'Dangerous goods detected'},{text:'What do you even do with this...',sub:'You need a firefighter'}]},
+  {min:93,pool:[{text:'Respect, king 🫡',sub:'You already won at life'},{text:'Your GF brags about this 📢',sub:'Trust me, she tells her friends'},{text:'Genetic lottery winner 🎰',sub:'Thank your parents'}]},
+  {min:88,pool:[{text:'Pants fit different huh 👖',sub:'Skinny jeans are not for you'},{text:'Pretty impressive 😏',sub:'Use it wisely'},{text:'Honestly jealous... 👏',sub:'Gotta respect it'}]},
+  {min:82,pool:[{text:'Oh not bad! 👀',sub:'Better than expected'},{text:'Passed! 💯',sub:'Size interview cleared'},{text:'Above average, congrats 🎉',sub:'Top 20% club'}]},
+  {min:75,pool:[{text:'Oh decent! 😮',sub:'Pleasantly surprised'},{text:'Above average = winning 🏅',sub:'Better than half the world'},{text:'Not bad at all 📊',sub:'That\'s a compliment'}]},
+  {min:65,pool:[{text:'Upper mid tier 📈',sub:'Angles can make it look bigger'},{text:'Workable size 💁',sub:'Awkwardly decent'},{text:'Slight flex allowed 🤏',sub:'Just a tiny flex'}]},
+  {min:55,pool:[{text:'Classic average 📊',sub:'National pride'},{text:'Average is the best they say ☺️',sub:'Doctor said so'},{text:'Standard issue 📋',sub:'Passed quality control'}]},
+  {min:45,pool:[{text:'You have a great personality! 🍺',sub:'Let\'s just drink to that'},{text:'Heart matters more 💝',sub:'Mom said so'},{text:'Well... it\'s not bad 😐',sub:'Not good either'}]},
+  {min:35,pool:[{text:'Small but mighty? 🌶️',sub:'Just small tbh'},{text:'Better have a pretty face 🪞',sub:'Compensate elsewhere'},{text:'Long fingers help... ✌️',sub:'lol does that help?'}]},
+  {min:25,pool:[{text:'Too cute to bite 🐹',sub:'Adorably tiny'},{text:'Compact size 🐣',sub:'GF will say "cute" (not a compliment)'},{text:'Carry-on approved ✈️',sub:'TSA won\'t notice'}]},
+  {min:15,pool:[{text:'Honestly... really small 📏',sub:'Face the truth'},{text:'Better make money 💰',sub:'Seriously. For real.'},{text:'Pocket edition 👛',sub:'Stay positive'}]},
+  {min:8,pool:[{text:'Wait... are you female? 🤔',sub:'No? Sorry'},{text:'AI gave up measuring 🤖',sub:'ERROR 404: SIZE NOT FOUND'},{text:'I... have no words 💬',sub:'What do I even say'}]},
+  {min:0,pool:[{text:'Sharing this = pure bravery 🫡',sub:'Respect, truly'},{text:'What matters is the unbreakable spirit 💪',sub:'Physically it might break tho'},{text:'Just be a good person 😇',sub:'...right?'}]}
 ];
 
 function getComment(pct) {
@@ -182,29 +222,29 @@ function renderResult(data) {
   app.innerHTML = `
     <div class="result-screen">
       <div class="result-card fade-in" id="result-card">
-        <div class="result-name">${name}의 분석 결과</div>
+        <div class="result-name">${name}${RT.result_of}</div>
         <div class="result-object-emoji fade-in fade-in-d1">${obj.emoji}</div>
         <div class="result-specs fade-in fade-in-d1">
           <div class="result-spec">
             <div class="result-spec-val">${size}</div>
-            <div class="result-spec-label">길이 (cm)</div>
+            <div class="result-spec-label">${RT.length_cm}</div>
           </div>
           <div class="result-spec" style="color:#555;font-size:24px;padding-top:4px">×</div>
           <div class="result-spec">
             <div class="result-spec-val">${girth}</div>
-            <div class="result-spec-label">둘레 (cm)</div>
+            <div class="result-spec-label">${RT.girth_cm}</div>
           </div>
         </div>
         <div class="result-score fade-in fade-in-d2">
-          <div class="result-score-label">총점</div>
+          <div class="result-score-label">${RT.total}</div>
           <div><span class="result-score-value">${totalScore}</span><span class="result-score-max"> / 100</span></div>
         </div>
-        <div class="result-object-name fade-in fade-in-d2">"${obj.name}" 사이즈</div>
+        <div class="result-object-name fade-in fade-in-d2">"${obj.name}"${RT.size_suffix}</div>
         <div class="result-object-desc fade-in fade-in-d2">${obj.desc}</div>
         <div class="result-divider"></div>
         <div class="result-percentile fade-in fade-in-d3">
-          <div class="percentile-text">전 세계 남성 기준</div>
-          <div class="percentile-value">상위 ${100 - percentile}%</div>
+          <div class="percentile-text">${RT.worldwide}</div>
+          <div class="percentile-value">${RT.top}${100 - percentile}%</div>
           <div class="percentile-bar"><div class="percentile-bar-fill" id="r-pbar" style="width:0%"></div></div>
         </div>
         <div class="result-comment fade-in fade-in-d3">
@@ -212,7 +252,7 @@ function renderResult(data) {
           <div class="comment-sub">${comment.sub}</div>
         </div>
         <div class="result-divider"></div>
-        <div class="result-factors-title fade-in fade-in-d4">AI 분석 근거</div>
+        <div class="result-factors-title fade-in fade-in-d4">${RT.ai_basis}</div>
         <div class="result-factors fade-in fade-in-d4">
           ${(factors || []).map(f => `
             <div class="factor">
@@ -224,18 +264,18 @@ function renderResult(data) {
             </div>
           `).join('')}
         </div>
-        <div class="result-disclaimer">* 발기 시 기준 예측 · 엔터테인먼트 목적</div>
+        <div class="result-disclaimer">${RT.disclaimer}</div>
         <div class="result-watermark">GUESS MY DICK</div>
       </div>
       <div class="ranking-section fade-in fade-in-d3" id="ranking-section" style="display:none">
-        <div class="ranking-title">🏆 그룹 랭킹</div>
+        <div class="ranking-title">${RT.ranking_title}</div>
         <div class="ranking-list" id="ranking-list"></div>
       </div>
       <div class="share-buttons fade-in fade-in-d4">
-        <button class="btn btn-primary" onclick="shareChallenge()">🔗 친구에게 도전장 보내기</button>
-        <p class="share-taunt">공유 안 하는 사나이들...<br>뭐 딱 봐도 결과 알겠제~ 🤭<br><span style="font-size:11px;opacity:.5">크게 나올 때까지 반복하는 소리 들린다~</span></p>
-        <button class="btn btn-secondary" onclick="shareImage()">📸 결과 이미지 저장</button>
-        <button class="btn btn-secondary btn-small" onclick="location.href='index.html'">🔄 다시 측정하기</button>
+        <button class="btn btn-primary" onclick="shareChallenge()">${RT.share_btn}</button>
+        <p class="share-taunt">${RT.share_taunt}</p>
+        <button class="btn btn-secondary" onclick="shareImage()">${RT.save_img}</button>
+        <button class="btn btn-secondary btn-small" onclick="location.href='index.html'">${RT.restart}</button>
       </div>
     </div>
   `;
@@ -262,7 +302,7 @@ function renderRanking(myName, mySize, group) {
   list.innerHTML = group.map((m, i) => `
     <div class="ranking-item ${m.name === myName ? 'me' : ''}">
       <div class="ranking-pos ${medals[i] || ''}">${i < 3 ? icons[i] : (i+1)}</div>
-      <div class="ranking-name">${m.name} ${m.name === myName ? '← 나' : ''}</div>
+      <div class="ranking-name">${m.name} ${m.name === myName ? RT.me : ''}</div>
       <div class="ranking-size">${m.size}cm</div>
     </div>
   `).join('');
@@ -289,7 +329,7 @@ async function shareChallenge() {
   const encoded = encodeGroup(group || []);
   const base = window.location.origin + window.location.pathname.replace('result.html', 'index.html');
   const url = base + (encoded ? '?g=' + encoded : '');
-  const text = `${obj.emoji} "${obj.name}" 사이즈래 ㅋㅋ\n나는 상위 ${100 - percentile}%!\n\n과연 나는 친구 중 몇 위..? 👇`;
+  const text = `${obj.emoji} "${obj.name}" ${RT.share_size}\n${RT.share_top}${100 - percentile}%!\n\n${RT.share_text_suffix}`;
 
   if (navigator.share) {
     try {
@@ -299,9 +339,9 @@ async function shareChallenge() {
   }
   try {
     await navigator.clipboard.writeText(text + '\n' + url);
-    alert('링크가 복사되었습니다! 친구에게 보내주세요 🔗');
+    alert(RT.link_copied);
   } catch {
-    prompt('아래 링크를 복사해서 공유하세요:', url);
+    prompt(RT.link_prompt, url);
   }
 }
 
@@ -452,7 +492,7 @@ async function shareImage() {
     document.body.removeChild(a);
   } catch (e) {
     console.error('Image save error:', e);
-    alert('이미지 저장 실패: ' + (e.message || e));
+    alert(RT.img_fail + ': ' + (e.message || e));
   }
 }
 
