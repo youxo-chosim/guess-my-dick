@@ -265,7 +265,9 @@ async function shareChallenge() {
   track('share_challenge', { score: resultData.totalScore, size: resultData.size });
   const { group, size, girth, percentile } = resultData;
   const obj = getObject(size);
-  const encoded = encodeGroup(group || []);
+  // 공유 시 자기 자신만 포함 (B→E 공유 시 A가 딸려가지 않도록)
+  const me = (group || []).filter(m => m.name === resultData.name);
+  const encoded = encodeGroup(me);
   const base = window.location.origin + window.location.pathname.replace('result.html', 'index.html');
   const url = base + (encoded ? '?g=' + encoded : '');
   const text = `${obj.emoji} "${obj.name}" 사이즈래 ㅋㅋ\n나는 상위 ${100 - percentile}%!\n\n과연 나는 친구 중 몇 위..? 👇`;
@@ -292,129 +294,119 @@ async function shareImage() {
     const obj = getObject(size);
     const comment = getComment(percentile);
 
-    // roundRect polyfill for older browsers
-    if (!CanvasRenderingContext2D.prototype.roundRect) {
-      CanvasRenderingContext2D.prototype.roundRect = function(x,y,w,h,r) {
-        if (typeof r === 'number') r = [r,r,r,r];
-        this.moveTo(x+r[0],y);
-        this.lineTo(x+w-r[1],y); this.arcTo(x+w,y,x+w,y+r[1],r[1]);
-        this.lineTo(x+w,y+h-r[2]); this.arcTo(x+w,y+h,x+w-r[2],y+h,r[2]);
-        this.lineTo(x+r[3],y+h); this.arcTo(x,y+h,x,y+h-r[3],r[3]);
-        this.lineTo(x,y+r[0]); this.arcTo(x,y,x+r[0],y,r[0]);
-        this.closePath(); return this;
-      };
+    // Helper: rounded rect without roundRect API
+    function rr(ctx,x,y,w,h,r){
+      ctx.moveTo(x+r,y);
+      ctx.lineTo(x+w-r,y); ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+      ctx.lineTo(x+w,y+h-r); ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+      ctx.lineTo(x+r,y+h); ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+      ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y);
+      ctx.closePath();
     }
 
-    const W = 750, H = 1200;
+    const W = 750, H = 1100;
     const canvas = document.createElement('canvas');
     canvas.width = W; canvas.height = H;
     const ctx = canvas.getContext('2d');
+    ctx.textAlign = 'center';
 
     // Background
     ctx.fillStyle = '#0a0a0a';
     ctx.fillRect(0, 0, W, H);
 
     // Card bg
-    const cx = 40, cy = 40, cw = W - 80, ch = H - 80;
     ctx.fillStyle = '#141414';
-    ctx.beginPath();
-    ctx.roundRect(cx, cy, cw, ch, 24);
-    ctx.fill();
+    ctx.beginPath(); rr(ctx, 40, 30, W-80, H-60, 24); ctx.fill();
 
     // Border
     ctx.strokeStyle = '#dc2626';
     ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.roundRect(cx, cy, cw, ch, 24);
-    ctx.stroke();
+    ctx.beginPath(); rr(ctx, 40, 30, W-80, H-60, 24); ctx.stroke();
 
     // Name
     ctx.fillStyle = '#888';
-    ctx.font = '600 28px -apple-system, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText(name + '의 분석 결과', W/2, 110);
+    ctx.font = '600 26px sans-serif';
+    ctx.fillText(name + '의 분석 결과', W/2, 90);
 
     // Emoji
-    ctx.font = '120px -apple-system, sans-serif';
-    ctx.fillText(obj.emoji, W/2, 250);
+    ctx.font = '100px sans-serif';
+    ctx.fillText(obj.emoji, W/2, 210);
 
     // Size × Girth
     ctx.fillStyle = '#dc2626';
-    ctx.font = '900 72px -apple-system, sans-serif';
-    ctx.fillText(size, W/2 - 90, 360);
+    ctx.font = '900 64px sans-serif';
+    ctx.fillText(String(size), W/2 - 85, 310);
     ctx.fillStyle = '#555';
-    ctx.font = '400 40px -apple-system, sans-serif';
-    ctx.fillText('×', W/2, 355);
+    ctx.font = '400 36px sans-serif';
+    ctx.fillText('×', W/2, 305);
     ctx.fillStyle = '#dc2626';
-    ctx.font = '900 72px -apple-system, sans-serif';
-    ctx.fillText(girth, W/2 + 90, 360);
+    ctx.font = '900 64px sans-serif';
+    ctx.fillText(String(girth), W/2 + 85, 310);
 
-    // Labels
     ctx.fillStyle = '#888';
-    ctx.font = '400 22px -apple-system, sans-serif';
-    ctx.fillText('길이 (cm)', W/2 - 90, 395);
-    ctx.fillText('둘레 (cm)', W/2 + 90, 395);
+    ctx.font = '400 20px sans-serif';
+    ctx.fillText('길이 (cm)', W/2 - 85, 340);
+    ctx.fillText('둘레 (cm)', W/2 + 85, 340);
 
     // Total score
     ctx.fillStyle = '#666';
-    ctx.font = '400 24px -apple-system, sans-serif';
-    ctx.fillText('총점', W/2, 460);
+    ctx.font = '400 22px sans-serif';
+    ctx.fillText('총점', W/2, 400);
     ctx.fillStyle = '#f59e0b';
-    ctx.font = '900 96px -apple-system, sans-serif';
-    ctx.fillText(totalScore, W/2 - 30, 560);
+    ctx.font = '900 80px sans-serif';
+    ctx.fillText(String(totalScore), W/2 - 30, 490);
     ctx.fillStyle = '#555';
-    ctx.font = '400 32px -apple-system, sans-serif';
-    ctx.fillText('/ 100', W/2 + 70, 555);
+    ctx.font = '400 28px sans-serif';
+    ctx.fillText('/ 100', W/2 + 60, 485);
 
     // Object name
     ctx.fillStyle = '#fff';
-    ctx.font = '800 36px -apple-system, sans-serif';
-    ctx.fillText('"' + obj.name + '" 사이즈', W/2, 640);
+    ctx.font = '800 32px sans-serif';
+    ctx.fillText('"' + obj.name + '" 사이즈', W/2, 560);
     ctx.fillStyle = '#999';
-    ctx.font = '400 24px -apple-system, sans-serif';
-    ctx.fillText(obj.desc, W/2, 680);
+    ctx.font = '400 22px sans-serif';
+    ctx.fillText(obj.desc, W/2, 595);
 
     // Divider
     ctx.fillStyle = '#333';
-    ctx.fillRect(W/2 - 40, 710, 80, 2);
+    ctx.fillRect(W/2 - 40, 625, 80, 2);
 
     // Percentile
     ctx.fillStyle = '#888';
-    ctx.font = '400 22px -apple-system, sans-serif';
-    ctx.fillText('전 세계 남성 기준', W/2, 755);
+    ctx.font = '400 20px sans-serif';
+    ctx.fillText('전 세계 남성 기준', W/2, 665);
     ctx.fillStyle = '#dc2626';
-    ctx.font = '900 52px -apple-system, sans-serif';
-    ctx.fillText('상위 ' + (100 - percentile) + '%', W/2, 815);
+    ctx.font = '900 44px sans-serif';
+    ctx.fillText('상위 ' + (100 - percentile) + '%', W/2, 720);
 
-    // Percentile bar
+    // Percentile bar (simple rect, no roundRect)
     ctx.fillStyle = '#222';
-    ctx.beginPath(); ctx.roundRect(100, 840, W - 200, 14, 7); ctx.fill();
+    ctx.fillRect(100, 745, W - 200, 12);
     const grad = ctx.createLinearGradient(100, 0, W - 100, 0);
     grad.addColorStop(0, '#f59e0b'); grad.addColorStop(1, '#dc2626');
     ctx.fillStyle = grad;
-    ctx.beginPath(); ctx.roundRect(100, 840, (W - 200) * percentile / 100, 14, 7); ctx.fill();
+    ctx.fillRect(100, 745, (W - 200) * percentile / 100, 12);
 
-    // Comment
-    ctx.fillStyle = 'rgba(220,38,38,0.15)';
-    ctx.beginPath(); ctx.roundRect(80, 890, W - 160, 90, 14); ctx.fill();
+    // Comment box
+    ctx.fillStyle = '#1e1010';
+    ctx.beginPath(); rr(ctx, 80, 785, W - 160, 80, 14); ctx.fill();
     ctx.fillStyle = '#fff';
-    ctx.font = '800 28px -apple-system, sans-serif';
-    ctx.fillText(comment.text, W/2, 930);
+    ctx.font = '800 24px sans-serif';
+    ctx.fillText(comment.text, W/2, 822);
     ctx.fillStyle = '#aaa';
-    ctx.font = '400 20px -apple-system, sans-serif';
-    ctx.fillText(comment.sub, W/2, 962);
+    ctx.font = '400 18px sans-serif';
+    ctx.fillText(comment.sub, W/2, 850);
 
     // Disclaimer
     ctx.fillStyle = '#555';
-    ctx.font = '400 18px -apple-system, sans-serif';
-    ctx.fillText('* 발기 시 기준 예측 · 엔터테인먼트 목적', W/2, 1050);
+    ctx.font = '400 16px sans-serif';
+    ctx.fillText('* 발기 시 기준 예측 · 엔터테인먼트 목적', W/2, 940);
     ctx.fillStyle = '#444';
-    ctx.font = '600 20px -apple-system, sans-serif';
-    ctx.letterSpacing = '2px';
-    ctx.fillText('GUESS MY DICK', W/2, 1090);
+    ctx.font = '600 18px sans-serif';
+    ctx.fillText('GUESS MY DICK', W/2, 975);
     ctx.fillStyle = '#555';
-    ctx.font = '400 18px -apple-system, sans-serif';
-    ctx.fillText('hot.chosim.me', W/2, 1120);
+    ctx.font = '400 16px sans-serif';
+    ctx.fillText('hot.chosim.me', W/2, 1005);
 
     canvas.toBlob(async (blob) => {
       if (navigator.share && navigator.canShare) {
