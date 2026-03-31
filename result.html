@@ -267,7 +267,7 @@ async function shareChallenge() {
   const encoded = encodeGroup(group || []);
   const base = window.location.origin + window.location.pathname.replace('result.html', 'index.html');
   const url = base + (encoded ? '?g=' + encoded : '');
-  const text = `🍆 나는 상위 ${100 - percentile}%! 너는 몇 cm일까?\n길이: ${size}cm | 둘레: ${girth}cm\n${obj.emoji} "${obj.name}" 사이즈\n\n지금 측정해봐 👇`;
+  const text = `${obj.emoji} "${obj.name}" 사이즈래 ㅋㅋ\n길이: ${size}cm | 둘레: ${girth}cm\n나는 상위 ${100 - percentile}%!\n\n너는 몇 cm? 측정해봐 👇`;
 
   if (navigator.share) {
     try {
